@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   FiHome,
   FiShoppingBag,
@@ -41,6 +41,7 @@ const categories = [
 
 const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isDarkMode, toggleTheme } = useTheme();
   const { user: authUser } = useAuth();
   const currentUser = authUser || user;
@@ -57,6 +58,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const adminAuthState = isAdminAuthenticated();
 
   const canShowSuggestions = isSearchOpen && searchQuery.trim().length > 0;
+  const activeCategory = new URLSearchParams(location.search).get('category') || '';
 
   useEffect(() => {
     const trimmed = searchQuery.trim();
@@ -241,17 +243,20 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
             </form>
           </div>
 
-          <div className="md:hidden pb-3">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          <div className="md:hidden pb-3 -mx-2 px-2 bg-black">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-1 border-b border-white/10">
               {categories.map((category) => {
                 const Icon = category.icon;
+                const isActive = activeCategory.toLowerCase() === category.value.toLowerCase();
                 return (
                   <Link
                     key={category.value}
                     to={`/products?category=${encodeURIComponent(category.value)}`}
-                    className={`shrink-0 min-w-[88px] flex items-center justify-center rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200 ${isScrolled ? 'py-2 px-3' : 'py-2'}`}
+                    className={`shrink-0 min-w-[72px] flex flex-col items-center justify-center pt-2 pb-1 text-[12px] font-semibold transition-colors ${
+                      isActive ? 'text-white border-b-2 border-blue-500' : 'text-gray-400 border-b-2 border-transparent'
+                    }`}
                   >
-                    {!isScrolled && <Icon className="w-4 h-4 mb-1 text-blue-500 dark:text-blue-300" />}
+                    {!isScrolled && <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-blue-400' : 'text-gray-500'}`} />}
                     <span>{category.label}</span>
                   </Link>
                 );
