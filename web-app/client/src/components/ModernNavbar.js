@@ -601,9 +601,10 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
               ) : (
                 <Link
                   to="/login"
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base whitespace-nowrap bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
                 >
-                  Get Started
+                  <span className="sm:hidden">Login</span>
+                  <span className="hidden sm:inline">Get Started</span>
                 </Link>
               )}
             </div>
