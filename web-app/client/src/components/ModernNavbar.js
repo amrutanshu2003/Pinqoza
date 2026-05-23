@@ -1,12 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiHome, FiShoppingBag, FiUser, FiShoppingCart, FiHeart, FiCalendar, FiLogOut, FiCreditCard, FiMenu, FiSun, FiMoon } from 'react-icons/fi';
+import {
+  FiHome,
+  FiShoppingBag,
+  FiUser,
+  FiShoppingCart,
+  FiHeart,
+  FiCalendar,
+  FiLogOut,
+  FiCreditCard,
+  FiMenu,
+  FiSun,
+  FiMoon,
+  FiSearch,
+  FiBox,
+  FiChevronRight
+} from 'react-icons/fi';
+import { MdLocalDrink, MdIcecream, MdBakeryDining } from 'react-icons/md';
+import { GiMilkCarton, GiButter, GiCheeseWedge } from 'react-icons/gi';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { clearAuthData, getAdminUser } from '../util/auth';
+import { searchProducts } from '../services/api';
+import { clearAuthData } from '../util/auth';
 import ADMIN_PATH from '../config/adminPath';
 
 const isAdminAuthenticated = () => !!localStorage.getItem('adminToken');
+
+const categories = [
+  { label: 'Milk', value: 'milk', icon: GiMilkCarton },
+  { label: 'Ghee', value: 'ghee', icon: MdLocalDrink },
+  { label: 'Cheese', value: 'cheese', icon: GiCheeseWedge },
+  { label: 'Curd', value: 'curd', icon: MdIcecream },
+  { label: 'Butter', value: 'butter', icon: GiButter },
+  { label: 'Paneer', value: 'paneer', icon: MdBakeryDining },
+  { label: 'Yogurt', value: 'yogurt', icon: MdLocalDrink },
+  { label: 'Cream', value: 'cream', icon: FiBox },
+  { label: 'Sweets', value: 'sweets', icon: MdBakeryDining },
+  { label: 'Grocery', value: 'grocery', icon: FiShoppingBag }
+];
 
 const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const navigate = useNavigate();
@@ -17,14 +48,80 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
+  const searchWrapRef = useRef(null);
   const adminAuthState = isAdminAuthenticated();
+
+  const canShowSuggestions = isSearchOpen && searchQuery.trim().length > 0;
+
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+    if (trimmed.length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return undefined;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        const res = await searchProducts(trimmed, 8);
+        const payload = res?.data;
+        const items = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.products)
+            ? payload.products
+            : Array.isArray(payload?.results)
+              ? payload.results
+              : [];
+        setSearchResults(items);
+      } catch (err) {
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 260);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const closeOnOutside = (event) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', closeOnOutside);
+    document.addEventListener('touchstart', closeOnOutside);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutside);
+      document.removeEventListener('touchstart', closeOnOutside);
+    };
+  }, []);
 
   const onSearchSubmit = (e) => {
     e.preventDefault();
     const q = searchQuery.trim();
     if (!q) return;
     navigate(`/products?search=${encodeURIComponent(q)}`);
+    setIsSearchOpen(false);
+    setShowMobileMenu(false);
+  };
+
+  const openSuggestion = (item) => {
+    const productId = item?._id || item?.id;
+    if (productId) {
+      navigate(`/product/${productId}`);
+    } else {
+      const term = item?.name || searchQuery.trim();
+      navigate(`/products?search=${encodeURIComponent(term)}`);
+    }
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSearchOpen(false);
     setShowMobileMenu(false);
   };
 
@@ -46,6 +143,32 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
     window.dispatchEvent(new CustomEvent('mm_logged_out'));
   };
 
+  const searchDropdown = useMemo(
+    () => (
+      <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-[80] rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl overflow-hidden">
+        {isSearching && <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Searching...</div>}
+        {!isSearching && searchQuery.trim().length < 2 && (
+          <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Type at least 2 letters</div>
+        )}
+        {!isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+          <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">No products found</div>
+        )}
+        {!isSearching && searchResults.map((item, idx) => (
+          <button
+            key={item?._id || item?.id || `${item?.name || 'item'}-${idx}`}
+            type="button"
+            onClick={() => openSuggestion(item)}
+            className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-blue-50/80 dark:hover:bg-gray-800/70"
+          >
+            <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-100">{item?.name || 'Product'}</span>
+            <FiChevronRight className="w-4 h-4 text-gray-400" />
+          </button>
+        ))}
+      </div>
+    ),
+    [isSearching, searchQuery, searchResults]
+  );
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-[60] bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60">
@@ -56,16 +179,19 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
               <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">Pinqoza</span>
             </Link>
 
-            <div className="hidden lg:block">
+            <div className="hidden lg:block" ref={searchWrapRef}>
               <form onSubmit={onSearchSubmit} className="relative max-w-[520px] mx-auto">
+                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
                   placeholder="Search products..."
-                  className="w-full h-10 pl-4 pr-20 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 text-sm"
+                  className="w-full h-10 pl-10 pr-20 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90 text-sm"
                 />
                 <button type="submit" className="absolute right-1.5 top-1.5 h-7 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600">Go</button>
+                {canShowSuggestions && searchDropdown}
               </form>
             </div>
 
@@ -91,26 +217,37 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
             </div>
           </div>
 
-          <div className="md:hidden pb-2">
+          <div className="md:hidden pb-2" ref={searchWrapRef}>
             <form onSubmit={onSearchSubmit} className="relative">
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchOpen(true)}
                 placeholder="Search products..."
-                className="w-full h-10 pl-4 pr-20 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/90 dark:bg-gray-900/90 text-sm"
+                className="w-full h-10 pl-10 pr-20 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/90 dark:bg-gray-900/90 text-sm"
               />
               <button type="submit" className="absolute right-1.5 top-1.5 h-7 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600">Go</button>
+              {canShowSuggestions && searchDropdown}
             </form>
           </div>
 
           <div className="md:hidden pb-3">
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-              <Link to="/products?category=milk" className="shrink-0 min-w-[82px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"><span>??</span><span>Milk</span></Link>
-              <Link to="/products?category=ghee" className="shrink-0 min-w-[82px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"><span>??</span><span>Ghee</span></Link>
-              <Link to="/products?category=cheese" className="shrink-0 min-w-[82px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"><span>??</span><span>Cheese</span></Link>
-              <Link to="/products?category=curd" className="shrink-0 min-w-[82px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"><span>??</span><span>Curd</span></Link>
-              <Link to="/products?category=butter" className="shrink-0 min-w-[82px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"><span>??</span><span>Butter</span></Link>
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Link
+                    key={category.value}
+                    to={`/products?category=${encodeURIComponent(category.value)}`}
+                    className="shrink-0 min-w-[88px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    <Icon className="w-4 h-4 mb-1 text-blue-500 dark:text-blue-300" />
+                    <span>{category.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -120,7 +257,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
             <div className="px-3 py-3 space-y-2">
               <Link to="/wishlist" onClick={() => setShowMobileMenu(false)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"><FiHeart className="w-4 h-4 text-rose-500" />Wishlist</Link>
               {currentUser && <Link to="/subscriptions" onClick={() => setShowMobileMenu(false)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"><FiCalendar className="w-4 h-4 text-purple-500" />Subscription</Link>}
-              {currentUser && <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"><span className="inline-flex items-center gap-3"><FiCreditCard className="w-4 h-4 text-yellow-500" />Wallet</span><span className="text-yellow-600 dark:text-yellow-300 font-bold">?250</span></div>}
+              {currentUser && <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"><span className="inline-flex items-center gap-3"><FiCreditCard className="w-4 h-4 text-yellow-500" />Wallet</span><span className="text-yellow-600 dark:text-yellow-300 font-bold">Rs250</span></div>}
               {!currentUser && !adminAuthState && <Link to="/login" onClick={() => setShowMobileMenu(false)} className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-sm font-semibold text-white">Get Started</Link>}
               {(currentUser || adminAuthState) && <button onClick={() => { setShowMobileMenu(false); setShowLogoutModal(true); }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-400/50 bg-red-500/10 text-sm font-semibold text-red-600 dark:text-red-400"><FiLogOut className="w-4 h-4" />Logout</button>}
             </div>
@@ -152,7 +289,6 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
         </div>
       )}
 
-      {/* Spacer for fixed navbar */}
       <div className="h-16"></div>
     </>
   );
