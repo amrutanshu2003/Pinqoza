@@ -194,32 +194,6 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
           : 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-white/10 dark:border-gray-800/10'
       }`}>
         <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-6">
-          {/* Mobile Search Bar (Top) */}
-          <div className="md:hidden pt-2 pb-2" ref={searchRef}>
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearchOpen(true);
-                }}
-                onFocus={() => setIsSearchOpen(true)}
-                placeholder="Search products..."
-                className="w-full h-10 pl-11 pr-20 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/90 dark:bg-gray-900/90 text-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-              />
-              <button
-                type="submit"
-                className="absolute right-1.5 top-1.5 h-7 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600"
-              >
-                Go
-              </button>
-            </form>
-          </div>
-
           <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 h-16">
             
             {/* Logo */}
@@ -876,6 +850,54 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   Logout
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Mobile Search Bar (Below Navbar Row) */}
+          <div className="md:hidden pb-2" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                onFocus={() => setIsSearchOpen(true)}
+                placeholder="Search products..."
+                className="w-full h-10 pl-11 pr-20 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/90 dark:bg-gray-900/90 text-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1.5 h-7 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600"
+              >
+                Go
+              </button>
+            </form>
+          </div>
+
+          {/* Mobile Category Icons (Below Search) */}
+          <div className="md:hidden pb-3">
+            <div className="grid grid-cols-4 gap-2">
+              <Link to="/products?category=milk" className="flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-base mb-0.5">🥛</span>
+                Milk
+              </Link>
+              <Link to="/products?category=ghee" className="flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-base mb-0.5">🧈</span>
+                Ghee
+              </Link>
+              <Link to="/products?category=cheese" className="flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-base mb-0.5">🧀</span>
+                Cheese
+              </Link>
+              <Link to="/products?category=curd" className="flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-base mb-0.5">🥣</span>
+                Curd
+              </Link>
             </div>
           </div>
         </div>
