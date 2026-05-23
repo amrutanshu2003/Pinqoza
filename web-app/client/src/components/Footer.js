@@ -24,7 +24,7 @@ const Footer = () => {
       <div className={`absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl ${isDarkMode ? 'bg-primary-500/20' : 'bg-primary-500/10'}`}></div>
       <div className={`absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl ${isDarkMode ? 'bg-secondary-500/20' : 'bg-secondary-500/10'}`}></div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-4 pt-8 pb-24 md:pb-8">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-2 md:col-span-1 group">
