@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const connectAdminDB = async () => {
   try {
     // Just connect once using mongoose.connect - it handles multiple connections
-    const adminMongoURI = process.env.ADMIN_MONGO_URI || 'mongodb+srv://Hackerbase:Amru2003@e-commerce.gqnqlb8.mongodb.net/adminpanel?appName=AdminPanel';
+    const adminMongoURI = process.env.ADMIN_MONGO_URI || process.env.ADMIN_MONGODB_URI || process.env.MONGODB_URI;
+    if (!adminMongoURI) {
+      throw new Error('ADMIN_MONGO_URI or ADMIN_MONGODB_URI is not set');
+    }
     
     // Check if already connected
     if (mongoose.connection.readyState !== 0) {
