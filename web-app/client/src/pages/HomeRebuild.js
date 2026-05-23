@@ -22,6 +22,8 @@ const HomeRebuild = () => {
   const prevIndicatorRef = useRef(0);
   const [wormFromIndex, setWormFromIndex] = useState(0);
   const [isWrapJump, setIsWrapJump] = useState(false);
+  const touchStartXRef = useRef(null);
+  const touchDeltaXRef = useRef(0);
 
   const bannerSlides = useMemo(() => {
     const list = featured
@@ -68,6 +70,36 @@ const HomeRebuild = () => {
         setTimeout(() => setIsWrapJump(false), 60);
       });
     });
+  };
+
+  const handleBannerTouchStart = (event) => {
+    const point = event.touches?.[0];
+    if (!point) return;
+    touchStartXRef.current = point.clientX;
+    touchDeltaXRef.current = 0;
+  };
+
+  const handleBannerTouchMove = (event) => {
+    if (touchStartXRef.current == null) return;
+    const point = event.touches?.[0];
+    if (!point) return;
+    touchDeltaXRef.current = point.clientX - touchStartXRef.current;
+  };
+
+  const handleBannerTouchEnd = () => {
+    const delta = touchDeltaXRef.current;
+    const threshold = 45;
+
+    if (Math.abs(delta) >= threshold) {
+      if (delta < 0) {
+        setActiveBanner((prev) => prev + 1);
+      } else {
+        setActiveBanner((prev) => (prev <= 1 ? loopPoint - 1 : prev - 1));
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchDeltaXRef.current = 0;
   };
 
   useEffect(() => {
@@ -245,6 +277,9 @@ const HomeRebuild = () => {
             className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4"
             onMouseEnter={() => setIsBannerHovered(true)}
             onMouseLeave={() => setIsBannerHovered(false)}
+            onTouchStart={handleBannerTouchStart}
+            onTouchMove={handleBannerTouchMove}
+            onTouchEnd={handleBannerTouchEnd}
           >
             <div
               className={`flex ${animateBanner ? 'transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)]' : ''}`}
