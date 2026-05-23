@@ -18,6 +18,9 @@ import {
 } from 'react-icons/fi';
 import { MdLocalDrink, MdIcecream, MdBakeryDining } from 'react-icons/md';
 import { GiMilkCarton, GiButter, GiCheeseWedge } from 'react-icons/gi';
+import { FaRegUserCircle } from 'react-icons/fa';
+import { RiFileList3Line } from 'react-icons/ri';
+import { TbLayoutGridAdd } from 'react-icons/tb';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { searchProducts } from '../services/api';
@@ -53,12 +56,15 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showDesktopAccountMenu, setShowDesktopAccountMenu] = useState(false);
 
   const searchWrapRef = useRef(null);
+  const desktopMenuRef = useRef(null);
   const adminAuthState = isAdminAuthenticated();
 
   const canShowSuggestions = isSearchOpen && searchQuery.trim().length > 0;
   const activeCategory = new URLSearchParams(location.search).get('category') || '';
+  const userInitial = (currentUser?.name || currentUser?.email || 'U').trim().charAt(0).toUpperCase();
 
   useEffect(() => {
     const trimmed = searchQuery.trim();
@@ -110,6 +116,16 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const closeDesktopMenuOnOutside = (event) => {
+      if (desktopMenuRef.current && !desktopMenuRef.current.contains(event.target)) {
+        setShowDesktopAccountMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', closeDesktopMenuOnOutside);
+    return () => document.removeEventListener('mousedown', closeDesktopMenuOnOutside);
   }, []);
 
   const onSearchSubmit = (e) => {
@@ -221,7 +237,41 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                 {!currentUser && !adminAuthState ? (
                   <Link to="/login" className="px-3 py-1.5 rounded-full text-sm text-white bg-gradient-to-r from-blue-600 to-purple-600">Get Started</Link>
                 ) : (
-                  <button onClick={() => setShowLogoutModal(true)} className="px-3 py-1.5 rounded-full text-sm border border-red-400/50 text-red-600 dark:text-red-400">Logout</button>
+                  <div
+                    className="relative"
+                    ref={desktopMenuRef}
+                    onMouseEnter={() => setShowDesktopAccountMenu(true)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setShowDesktopAccountMenu(true)}
+                      className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-sm flex items-center justify-center shadow-md"
+                      aria-label="Account menu"
+                    >
+                      {userInitial}
+                    </button>
+                    {showDesktopAccountMenu && (
+                      <div className="absolute right-0 top-full mt-1 w-56 rounded-2xl border border-white/20 dark:border-white/10 bg-white/55 dark:bg-gray-900/45 backdrop-blur-2xl shadow-[0_20px_50px_-20px_rgba(59,130,246,0.55)] overflow-hidden animate-[fadeIn_.22s_ease-out]">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 via-cyan-400/10 to-purple-500/15 pointer-events-none" />
+                        <Link to="/account" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
+                          <FaRegUserCircle className="w-4 h-4 text-cyan-500" /> Account
+                        </Link>
+                        <Link to="/orders" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
+                          <RiFileList3Line className="w-4 h-4 text-amber-500" /> Orders
+                        </Link>
+                        <Link to="/subscriptions" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
+                          <TbLayoutGridAdd className="w-4 h-4 text-violet-500" /> Subscription
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setShowLogoutModal(true)}
+                          className="relative w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50/70 dark:hover:bg-red-500/10 transition-colors"
+                        >
+                          <FiLogOut className="w-4 h-4 text-rose-500" /> Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
