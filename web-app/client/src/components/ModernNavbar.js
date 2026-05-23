@@ -51,6 +51,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const searchWrapRef = useRef(null);
   const adminAuthState = isAdminAuthenticated();
@@ -100,6 +101,13 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
       document.removeEventListener('mousedown', closeOnOutside);
       document.removeEventListener('touchstart', closeOnOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const onSearchSubmit = (e) => {
@@ -241,9 +249,9 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   <Link
                     key={category.value}
                     to={`/products?category=${encodeURIComponent(category.value)}`}
-                    className="shrink-0 min-w-[88px] flex flex-col items-center justify-center py-2 rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className={`shrink-0 min-w-[88px] flex items-center justify-center rounded-lg bg-white/70 dark:bg-gray-800/50 border border-gray-200/70 dark:border-gray-700/70 text-xs font-medium text-gray-700 dark:text-gray-200 ${isScrolled ? 'py-2 px-3' : 'py-2'}`}
                   >
-                    <Icon className="w-4 h-4 mb-1 text-blue-500 dark:text-blue-300" />
+                    {!isScrolled && <Icon className="w-4 h-4 mb-1 text-blue-500 dark:text-blue-300" />}
                     <span>{category.label}</span>
                   </Link>
                 );
