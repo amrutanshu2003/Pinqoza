@@ -1,0 +1,27 @@
+const mongoose = require('mongoose');
+
+const connectAdminDB = async () => {
+  try {
+    // Just connect once using mongoose.connect - it handles multiple connections
+    const adminMongoURI = process.env.ADMIN_MONGO_URI || 'mongodb+srv://Hackerbase:Amru2003@e-commerce.gqnqlb8.mongodb.net/adminpanel?appName=AdminPanel';
+    
+    // Check if already connected
+    if (mongoose.connection.readyState !== 0) {
+      // Already connected to main DB, create a new connection
+      const adminConn = mongoose.createConnection(adminMongoURI);
+      console.log(`Admin Database Connected: ${adminConn.connection.host}`);
+      return adminConn;
+    }
+    
+    // First connection
+    const conn = await mongoose.connect(adminMongoURI);
+    console.log(`Admin Database Connected: ${conn.connection.host}`);
+    return conn;
+  } catch (error) {
+    console.error(`Admin DB Error: ${error.message}`);
+    // Continue with main connection as fallback
+    return mongoose.connection;
+  }
+};
+
+module.exports = connectAdminDB;

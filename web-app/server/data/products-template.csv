@@ -1,0 +1,4 @@
+name,brand,category,subcategory,description,price,stock,unit,image,isFeatured,isActive
+Pinqoza Fresh Cow Milk 1L,Pinqoza Fresh,milk,fresh-milk,Fresh daily milk for tea coffee and drinking,68,120,L,,true,true
+Pinqoza Premium Smartphone 6GB 128GB,Pinqoza Premium,electronics,mobiles,Affordable smartphone with strong battery and display,12999,40,pc,,true,true
+Pinqoza Daily Refrigerator 190L,Pinqoza Daily,electronics,refrigerator,Single door refrigerator for home kitchen,18999,18,pc,,false,true

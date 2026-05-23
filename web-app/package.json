@@ -1,0 +1,27 @@
+{
+  "name": "pinqoza-fullstack",
+  "version": "1.0.0",
+  "description": "Pinqoza E-commerce Fullstack Application",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm start",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
+    "server:dev": "cd server && npm run dev",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "ecommerce",
+    "marketplace",
+    "react",
+    "node",
+    "express",
+    "mongodb"
+  ],
+  "author": "Pinqoza Team",
+  "license": "MIT"
+}

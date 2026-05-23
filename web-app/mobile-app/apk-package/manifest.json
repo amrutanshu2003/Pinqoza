@@ -1,0 +1,20 @@
+{ 
+  "name": "Pinqoza", 
+  "displayName": "Pinqoza", 
+  "version": "1.0.0", 
+  "description": "Fresh dairy products delivery app", 
+  "main": "index.html", 
+  "scripts": { 
+    "start": "index.html" 
+  }, 
+  "window": { 
+    "title": "Pinqoza", 
+    "icon": "icon.svg", 
+    "toolbar": true, 
+    "frame": true, 
+    "width": 375, 
+    "height": 812, 
+    "resizable": true, 
+    "webSecurity": false 
+  } 
+} 
