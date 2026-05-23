@@ -28,6 +28,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const searchRef = useRef(null);
   const searchDebounceRef = useRef(null);
   // placeholder animation removed; keep search UX simple
@@ -296,8 +297,8 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
               )}
             </div>
 
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 z-30 justify-self-end">
+            {/* Navigation Links (Desktop/Tablet) */}
+            <div className="hidden md:flex items-center space-x-2 sm:space-x-3 md:space-x-4 z-30 justify-self-end">
               <Link
                 to="/products"
                 className="lg:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
@@ -608,8 +609,76 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                 </Link>
               )}
             </div>
+
+            {/* Mobile Right Actions */}
+            <div className="flex md:hidden items-center justify-end gap-2 z-30">
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => setShowMobileMenu((prev) => !prev)}
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                aria-label="Open menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Search Bar */}
+          <div className="md:hidden pb-3" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                onFocus={() => setIsSearchOpen(true)}
+                placeholder="Search products..."
+                className="w-full h-10 pl-11 pr-20 rounded-xl border border-gray-200/80 dark:border-gray-700/80 bg-white/90 dark:bg-gray-900/90 text-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-1.5 top-1.5 h-7 px-3 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600"
+              >
+                Go
+              </button>
+            </form>
           </div>
         </div>
+
+        {/* Mobile Menu Panel */}
+        {showMobileMenu && (
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
+            <div className="px-3 py-3 grid grid-cols-2 gap-2">
+              <Link to="/cart" onClick={() => setShowMobileMenu(false)} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">Cart {cartCount > 0 ? `(${cartCount})` : ''}</Link>
+              <Link to="/wishlist" onClick={() => setShowMobileMenu(false)} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">Wishlist</Link>
+              {currentUser && <Link to="/orders" onClick={() => setShowMobileMenu(false)} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">Orders</Link>}
+              {currentUser && <Link to="/account" onClick={() => setShowMobileMenu(false)} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200">Account</Link>}
+              {!currentUser && !adminAuthState && <Link to="/login" onClick={() => setShowMobileMenu(false)} className="px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-sm text-white text-center">Get Started</Link>}
+              {(currentUser || adminAuthState) && <button onClick={() => { setShowMobileMenu(false); setShowLogoutModal(true); }} className="px-3 py-2 rounded-lg border border-red-300 text-sm text-red-600 dark:text-red-400">Logout</button>}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Modern Logout Popup */}
