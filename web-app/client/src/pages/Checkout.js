@@ -457,7 +457,7 @@ const Checkout = () => {
 
   return (
     <div className="fade-in min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-black dark:to-black">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden">
         {/* Modern Header */}
         <div className="text-center mb-12">
           <div className="inline-block relative group">
@@ -481,11 +481,11 @@ const Checkout = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2 space-y-8">
               {/* Shipping Address */}
-              <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-8 shadow-xl transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform hover:scale-[1.01]`}>
+              <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-4 sm:p-8 shadow-xl transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform lg:hover:scale-[1.01]`}>
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg">
                     <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -695,7 +695,7 @@ const Checkout = () => {
             </div>
 
             {/* Payment Method */}
-            <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-8 shadow-xl transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform hover:scale-[1.01]`}>
+            <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-4 sm:p-8 shadow-xl transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform lg:hover:scale-[1.01]`}>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -827,7 +827,7 @@ const Checkout = () => {
 
             {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-8 shadow-xl sticky top-8 transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform hover:scale-[1.01]`}>
+            <div className={`relative overflow-hidden rounded-3xl border-2 ${isDarkMode ? 'border-white/10 bg-gray-800/50' : 'border-gray-200 bg-white/70'} backdrop-blur-xl p-4 sm:p-8 shadow-xl lg:sticky lg:top-8 transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform lg:hover:scale-[1.01]`}>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
                   <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -846,8 +846,8 @@ const Checkout = () => {
                   }
                 `}</style>
                 {cart.items.map((item) => (
-                  <div key={item._id} className={`flex justify-between items-center p-3 rounded-xl ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-100/50'}`}>
-                    <div className="flex items-center gap-3 flex-1">
+                  <div key={item._id} className={`flex justify-between items-center gap-2 p-3 rounded-xl ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-100/50'}`}>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Product Image */}
                       <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                         {item.image ? (
@@ -870,20 +870,20 @@ const Checkout = () => {
                         </div>
                       </div>
                       
-                      <div className="flex-1">
-                        <p className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{item.name}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm break-words ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>{item.name}</p>
                         <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>x {item.quantity}</p>
                       </div>
                     </div>
-                    <span className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{item.price * item.quantity}</span>
+                    <span className={`font-bold text-sm sm:text-base text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
               
               <div className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} pt-6 space-y-4`}>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-3">
                   <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Subtotal</span>
-                  <span className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{cart.totalPrice}</span>
+                  <span className={`font-medium text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{cart.totalPrice}</span>
                 </div>
 
                 {/* Coupon */}
@@ -941,14 +941,14 @@ const Checkout = () => {
                   )}
                 </div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-3">
                   <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Delivery</span>
                   <span className="font-bold text-green-600 dark:text-green-400">Free</span>
                 </div>
                 <div className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} pt-4`}>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-3">
                     <span className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Total</span>
-                    <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    <span className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-primary-400 text-right break-words">
                       ₹{Math.max(0, (cart.totalPrice || 0) - (couponDiscount || 0) - (pointsToRedeem || 0))}
                     </span>
                   </div>
