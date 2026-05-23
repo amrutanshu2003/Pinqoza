@@ -12,7 +12,8 @@ const connectAdminDB = async () => {
     if (mongoose.connection.readyState !== 0) {
       // Already connected to main DB, create a new connection
       const adminConn = mongoose.createConnection(adminMongoURI);
-      console.log(`Admin Database Connected: ${adminConn.connection.host}`);
+      await adminConn.asPromise();
+      console.log(`Admin Database Connected: ${adminConn.host}`);
       return adminConn;
     }
     
