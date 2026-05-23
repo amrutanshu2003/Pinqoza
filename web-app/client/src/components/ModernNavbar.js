@@ -186,16 +186,16 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   return (
     <>
       {/* Modern Glass Effect Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
+      <nav className={`fixed top-0 left-0 right-0 z-[60] overflow-x-clip transition-all duration-300 ${
         isScrolled 
           ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-white/20 dark:border-gray-800/20 shadow-lg' 
           : 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-white/10 dark:border-gray-800/10'
       }`}>
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-6">
           <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 h-16">
             
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 group -ml-1 sm:-ml-2 z-30">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group -ml-1 sm:-ml-2 z-30 min-w-0">
               <div className="relative">
                 <div className="w-10 h-10 relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg opacity-25 blur-lg group-hover:opacity-35 transition-opacity duration-300"></div>
@@ -209,15 +209,15 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="flex flex-col min-w-0">
+                <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">
                   Pinqoza
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Shop Everything</span>
+                <span className="hidden sm:block text-xs text-gray-500 dark:text-gray-400">Shop Everything</span>
               </div>
             </Link>
 
-            <div ref={searchRef} className="hidden md:block w-[36rem] max-w-[44vw] min-w-[24rem] justify-self-center relative">
+            <div ref={searchRef} className="hidden lg:block w-full max-w-[32rem] xl:max-w-[40rem] min-w-0 justify-self-center relative">
               <form onSubmit={handleSearchSubmit} className="relative">
                 <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -297,7 +297,17 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
             </div>
 
             {/* Navigation Links */}
-            <div className="flex items-center space-x-4 sm:space-x-5 md:space-x-6 z-30 justify-self-end">
+            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 z-30 justify-self-end">
+              <Link
+                to="/products"
+                className="lg:hidden p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                aria-label="Search products"
+                title="Search products"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </Link>
               
               {!currentUser && (
                 <Link

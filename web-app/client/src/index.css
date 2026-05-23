@@ -4,6 +4,20 @@
 
 @tailwind utilities;
 
+html,
+body,
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
 
 
 @layer base {
