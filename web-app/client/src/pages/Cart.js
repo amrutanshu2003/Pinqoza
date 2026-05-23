@@ -277,7 +277,7 @@ const Cart = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {/* Select All Header */}
@@ -307,7 +307,7 @@ const Cart = () => {
             {cart.items.map((item) => (
               <div key={item._id} className={`group relative overflow-hidden transition-all duration-700 hover:shadow-4xl hover:shadow-primary-500/20 transform hover:scale-[1.02] rounded-2xl border-2 ${selectedItems.includes(item._id) ? 'border-primary-500 bg-primary-50/50 dark:bg-black/30' : 'border-gray-200/50 dark:border-gray-700/50 hover:border-primary-500/50'} bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-black dark:via-black dark:to-black backdrop-blur-xl`}>
                 <div className="p-6">
-                  <div className="flex items-start space-x-4">
+                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
                     {/* Checkbox */}
                     <div className="flex items-center justify-center pt-2">
                       <input
@@ -318,7 +318,7 @@ const Cart = () => {
                       />
                     </div>
                     {/* Item Image */}
-                    <div className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0">
                       {/* Animated Background Gradient */}
                       <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-secondary-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
                       
@@ -343,8 +343,8 @@ const Cart = () => {
                     </div>
 
                     {/* Item Details */}
-                    <div className="flex-1">
-                      <h3 className={`font-bold text-lg mb-1 capitalize transition-all duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-bold text-base sm:text-lg mb-1 capitalize transition-all duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 break-words ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                         {item.name}
                       </h3>
                       <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-3`}>
@@ -352,7 +352,7 @@ const Cart = () => {
                       </p>
                       
                       {/* Quantity Selector */}
-                      <div className="flex items-center space-x-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <div className={`flex items-center border-2 ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} rounded-xl overflow-hidden shadow-sm backdrop-blur-sm ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/50'}`}>
                           <button
                             onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
@@ -370,8 +370,8 @@ const Cart = () => {
                         </div>
                         
                         {/* Item Total */}
-                        <div className="flex-1 text-right">
-                          <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                        <div className="sm:flex-1 text-left sm:text-right">
+                          <p className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-primary-400 break-words">
                             ₹{item.price * item.quantity}
                           </p>
                         </div>
@@ -396,7 +396,7 @@ const Cart = () => {
 
           {/* Cart Summary */}
           <div className="lg:col-span-1">
-            <div className={`relative p-6 rounded-3xl ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-xl border border-white/10' : 'bg-white/70 backdrop-blur-xl border border-gray-200'} shadow-xl sticky top-8`}>
+            <div className={`relative p-4 sm:p-6 rounded-3xl ${isDarkMode ? 'bg-gray-800/50 backdrop-blur-xl border border-white/10' : 'bg-white/70 backdrop-blur-xl border border-gray-200'} shadow-xl lg:sticky lg:top-8 overflow-hidden`}>
               <h3 className={`text-xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 Order Summary
               </h3>
@@ -406,9 +406,9 @@ const Cart = () => {
                 <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100/50'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
                   <div className={`flex justify-between items-center pb-2 border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
                     <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Selected Items</span>
-                    <span className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                      {selectedItems.length} of {cart.totalItems}
-                    </span>
+                  <span className={`font-bold break-words text-right ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                    {selectedItems.length} of {cart.totalItems}
+                  </span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
                     <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Selected Total</span>
@@ -421,7 +421,7 @@ const Cart = () => {
                 {/* Cart Total */}
                 <div className={`flex justify-between items-center pb-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                   <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cart Total ({cart.totalItems} items)</span>
-                  <span className={`text-lg font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{cart.totalPrice}</span>
+                  <span className={`text-lg font-bold break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{cart.totalPrice}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Delivery</span>
@@ -430,7 +430,7 @@ const Cart = () => {
                 <div className={`h-px ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} my-4`}></div>
                 <div className="flex justify-between items-center">
                   <span className={`text-xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Order Total</span>
-                  <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">₹{getSelectedItemsTotal()}</span>
+                  <span className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-primary-400 break-words text-right">₹{getSelectedItemsTotal()}</span>
                 </div>
               </div>
 
