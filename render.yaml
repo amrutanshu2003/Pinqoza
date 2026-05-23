@@ -2,7 +2,7 @@ services:
   - type: web
     name: pinqoza-api
     runtime: node
-    rootDir: server
+    rootDir: web-app/server
     buildCommand: npm install
     startCommand: npm start
     plan: free
