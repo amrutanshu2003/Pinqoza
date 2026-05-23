@@ -130,7 +130,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black">
       <ModernNavbar user={user} onLogout={handleLogout} cartCount={cartCount} />
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
         <Routes>
           <Route path="/" element={<HomeRebuild />} />
           <Route path="/products" element={<Products />} />

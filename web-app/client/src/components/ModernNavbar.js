@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiHome, FiShoppingBag, FiUser, FiShoppingCart, FiHeart, FiCalendar, FiLogOut, FiCreditCard } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { searchProducts } from '../services/api';
@@ -672,36 +673,13 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
           <div className="md:hidden border-t border-gray-200/70 dark:border-gray-700/70 bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl animate-[fadeIn_0.25s_ease-out]">
             <div className="px-3 py-3 space-y-2">
               <Link
-                to="/cart"
-                onClick={() => setShowMobileMenu(false)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-gray-800 dark:text-gray-100"
-              >
-                <span className="inline-flex items-center gap-3 text-sm font-semibold">
-                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17" /></svg>
-                  Cart
-                </span>
-                <span className="text-xs font-bold text-blue-600 dark:text-blue-400">{cartCount > 0 ? cartCount : 0}</span>
-              </Link>
-
-              <Link
                 to="/wishlist"
                 onClick={() => setShowMobileMenu(false)}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"
               >
-                <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682" /></svg>
+                <FiHeart className="w-4 h-4 text-rose-500" />
                 Wishlist
               </Link>
-
-              {currentUser && (
-                <Link
-                  to="/orders"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"
-                >
-                  <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12" /></svg>
-                  Orders
-                </Link>
-              )}
 
               {currentUser && (
                 <Link
@@ -710,7 +688,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-sm font-semibold text-gray-800 dark:text-gray-100"
                 >
                   <span className="inline-flex items-center gap-3">
-                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10" /></svg>
+                    <FiCalendar className="w-4 h-4 text-purple-500" />
                     Subscription
                   </span>
                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300">Active</span>
@@ -720,22 +698,11 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
               {currentUser && (
                 <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 text-sm font-semibold text-gray-800 dark:text-gray-100">
                   <span className="inline-flex items-center gap-3">
-                    <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1" /></svg>
+                    <FiCreditCard className="w-4 h-4 text-yellow-500" />
                     Wallet
                   </span>
                   <span className="text-yellow-600 dark:text-yellow-300 font-bold">₹250</span>
                 </div>
-              )}
-
-              {currentUser && (
-                <Link
-                  to="/account"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-white/20 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/40 text-sm font-semibold text-gray-800 dark:text-gray-100"
-                >
-                  <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0" /></svg>
-                  Account
-                </Link>
               )}
 
               {!currentUser && !adminAuthState && (
@@ -753,7 +720,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   onClick={() => { setShowMobileMenu(false); setShowLogoutModal(true); }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-400/50 bg-red-500/10 text-sm font-semibold text-red-600 dark:text-red-400"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                  <FiLogOut className="w-4 h-4" />
                   Logout
                 </button>
               )}
@@ -761,6 +728,33 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
           </div>
         )}
       </nav>
+
+      {/* Mobile Bottom Sticky Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[70] border-t border-gray-200/70 dark:border-gray-700/70 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
+        <div className="grid grid-cols-4 px-1 py-1">
+          <Link to="/" className="flex flex-col items-center justify-center py-2 text-[11px] font-medium text-gray-700 dark:text-gray-200">
+            <FiHome className="w-5 h-5 mb-1" />
+            Home
+          </Link>
+          <Link to="/orders" className="flex flex-col items-center justify-center py-2 text-[11px] font-medium text-gray-700 dark:text-gray-200">
+            <FiShoppingBag className="w-5 h-5 mb-1" />
+            Orders
+          </Link>
+          <Link to="/account" className="flex flex-col items-center justify-center py-2 text-[11px] font-medium text-gray-700 dark:text-gray-200">
+            <FiUser className="w-5 h-5 mb-1" />
+            Account
+          </Link>
+          <Link to="/cart" className="relative flex flex-col items-center justify-center py-2 text-[11px] font-medium text-gray-700 dark:text-gray-200">
+            <FiShoppingCart className="w-5 h-5 mb-1" />
+            Cart
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-5 min-w-[16px] h-4 px-1 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+        </div>
+      </div>
 
       {/* Modern Logout Popup */}
       {showLogoutModal && (
