@@ -125,9 +125,9 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2">
               {[
-                { icon: '📍', text: 'Mumbai, Maharashtra, India' },
-                { icon: '📞', text: '+91 98765 43210' },
-                { icon: '✉️', text: 'pinqoza.support@gmail.com' }
+                { icon: '📍', text: 'Sarisa, Balasore, Odisha, 757055', href: 'https://www.google.com/maps/search/?api=1&query=Sarisa%2C%20Balasore%2C%20Odisha%2C%20757055', external: true },
+                { icon: '📞', text: '+91 9337606293', href: 'tel:+919337606293' },
+                { icon: '✉️', text: 'pinqoza@gmail.com', href: 'https://mail.google.com/mail/?view=cm&fs=1&to=pinqoza@gmail.com', external: true }
               ].map((contact, index) => (
                 <li 
                   key={index}
@@ -136,7 +136,18 @@ const Footer = () => {
                   <span className={`w-8 h-8 rounded-full border flex items-center justify-center transform group-hover/item:scale-110 transition-all duration-300 group-hover/item:bg-gradient-to-br group-hover/item:from-primary-500 group-hover/item:to-secondary-500 group-hover/item:border-transparent ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-300'}`}>
                     {contact.icon}
                   </span>
-                  <span className="text-sm">{contact.text}</span>
+                  {contact.href ? (
+                    <a
+                      href={contact.href}
+                      className="text-sm hover:underline"
+                      target={contact.external ? '_blank' : undefined}
+                      rel={contact.external ? 'noreferrer' : undefined}
+                    >
+                      {contact.text}
+                    </a>
+                  ) : (
+                    <span className="text-sm">{contact.text}</span>
+                  )}
                 </li>
               ))}
             </ul>
