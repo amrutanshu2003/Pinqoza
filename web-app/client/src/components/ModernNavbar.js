@@ -23,24 +23,24 @@ import { RiFileList3Line } from 'react-icons/ri';
 import { TbLayoutGridAdd } from 'react-icons/tb';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { searchProducts } from '../services/api';
+import { getProductCategories, searchProducts } from '../services/api';
 import { clearAuthData } from '../util/auth';
 import ADMIN_PATH from '../config/adminPath';
 
 const isAdminAuthenticated = () => !!localStorage.getItem('adminToken');
 
-const categories = [
-  { label: 'Milk', value: 'milk', icon: GiMilkCarton },
-  { label: 'Ghee', value: 'ghee', icon: MdLocalDrink },
-  { label: 'Cheese', value: 'cheese', icon: GiCheeseWedge },
-  { label: 'Curd', value: 'curd', icon: MdIcecream },
-  { label: 'Butter', value: 'butter', icon: GiButter },
-  { label: 'Paneer', value: 'paneer', icon: MdBakeryDining },
-  { label: 'Yogurt', value: 'yogurt', icon: MdLocalDrink },
-  { label: 'Cream', value: 'cream', icon: FiBox },
-  { label: 'Sweets', value: 'sweets', icon: MdBakeryDining },
-  { label: 'Grocery', value: 'grocery', icon: FiShoppingBag }
-];
+const iconByCategory = {
+  milk: GiMilkCarton,
+  ghee: MdLocalDrink,
+  cheese: GiCheeseWedge,
+  curd: MdIcecream,
+  butter: GiButter,
+  paneer: MdBakeryDining,
+  yogurt: MdLocalDrink,
+  cream: FiBox,
+  sweets: MdBakeryDining,
+  grocery: FiShoppingBag
+};
 
 const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const navigate = useNavigate();
@@ -57,6 +57,9 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showDesktopAccountMenu, setShowDesktopAccountMenu] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(false);
 
   const searchWrapRef = useRef(null);
   const desktopMenuRef = useRef(null);
@@ -98,6 +101,34 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   }, [searchQuery]);
 
   useEffect(() => {
+    let active = true;
+    const loadCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        setCategoriesError(false);
+        const res = await getProductCategories();
+        if (!active) return;
+        const list = Array.isArray(res?.data) ? res.data : [];
+        const normalized = list.slice(0, 12).map((raw) => {
+          const value = String(raw || '').toLowerCase();
+          return { label: String(raw || ''), value };
+        });
+        setCategories(normalized);
+      } catch (e) {
+        if (!active) return;
+        setCategories([]);
+        setCategoriesError(true);
+      } finally {
+        if (active) setCategoriesLoading(false);
+      }
+    };
+    loadCategories();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const closeOnOutside = (event) => {
       if (searchWrapRef.current && !searchWrapRef.current.contains(event.target)) {
         setIsSearchOpen(false);
@@ -112,7 +143,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -197,6 +228,22 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
 
   return (
     <>
+      <style>{`
+        @keyframes navCatShimmer {
+          0% { background-position: -220% 0; }
+          100% { background-position: 220% 0; }
+        }
+        .nav-cat-skeleton {
+          background: linear-gradient(100deg, rgba(255,255,255,0.04) 20%, rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.04) 60%);
+          background-size: 220% 100%;
+          animation: navCatShimmer 2.8s linear infinite;
+        }
+        .nav-cat-skeleton-light {
+          background: linear-gradient(100deg, rgba(107,114,128,0.08) 20%, rgba(107,114,128,0.20) 40%, rgba(107,114,128,0.08) 60%);
+          background-size: 220% 100%;
+          animation: navCatShimmer 2.8s linear infinite;
+        }
+      `}</style>
       <nav className="fixed top-0 left-0 right-0 z-[60] bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60">
         <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-6">
           <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 h-16">
@@ -293,35 +340,46 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
           </div>
 
           <div className={`md:hidden pb-2 -mx-2 px-2 border-b transition-all duration-300 ${
-            isScrolled
-              ? 'bg-white/95 dark:bg-gray-900/95 border-gray-200/70 dark:border-gray-700/70'
-              : 'bg-black border-white/10'
+            isDarkMode
+              ? 'bg-black border-white/10'
+              : 'bg-white border-gray-200/80'
           }`}>
-            <div className={`flex flex-wrap items-center scrollbar-hide transition-all duration-300 ${
+            <div className={`flex flex-nowrap items-center overflow-x-auto scrollbar-hide transition-all duration-300 ${
               isScrolled
-                ? 'gap-2 pb-0.5 overflow-hidden'
-                : 'gap-3 pb-1 overflow-hidden'
+                ? 'gap-2 pb-0.5'
+                : 'gap-3 pb-1'
             }`}>
-              {categories.map((category) => {
-                const Icon = category.icon;
+              {(categoriesLoading || categoriesError) && Array.from({ length: 8 }).map((_, idx) => (
+                <div
+                  key={`nav-cat-sk-${idx}`}
+                  className={`shrink-0 min-w-[74px] flex flex-col items-center justify-center pt-2 pb-1`}
+                >
+                  {!isScrolled && (
+                    <div className={`w-4 h-4 mb-1 rounded ${isDarkMode ? 'nav-cat-skeleton' : 'nav-cat-skeleton-light'}`} />
+                  )}
+                  <div className={`h-3 w-12 rounded ${isDarkMode ? 'nav-cat-skeleton' : 'nav-cat-skeleton-light'}`} />
+                </div>
+              ))}
+              {!categoriesLoading && !categoriesError && categories.map((category) => {
+                const Icon = iconByCategory[category.value] || FiBox;
                 const isActive = activeCategory.toLowerCase() === category.value.toLowerCase();
                 return (
                   <Link
                     key={category.value}
                     to={`/products?category=${encodeURIComponent(category.value)}`}
-                    className={`shrink-0 min-w-[72px] flex items-center justify-center text-[12px] font-semibold transition-all duration-300 ${
-                      isScrolled ? 'px-3 py-1.5 rounded-full border' : 'pt-2 pb-1 border-b-2'
+                    className={`shrink-0 min-w-[74px] flex flex-col items-center justify-center text-[12px] font-semibold transition-all duration-300 ${
+                      isScrolled ? 'px-2 py-1.5 border-b-2' : 'pt-2 pb-1 border-b-2'
                     } ${
                       isActive
                         ? isScrolled
-                          ? 'text-blue-700 dark:text-blue-300 border-blue-500 bg-blue-50/80 dark:bg-blue-500/10'
+                          ? 'text-blue-700 dark:text-blue-300 border-blue-500'
                           : 'text-white border-blue-500'
                         : isScrolled
-                          ? 'text-gray-700 dark:text-gray-300 border-gray-300/80 dark:border-gray-600'
-                          : 'text-gray-400 border-transparent'
+                          ? 'text-gray-700 dark:text-gray-300 border-transparent'
+                          : 'text-gray-700 dark:text-gray-300 border-transparent'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 transition-all duration-200 ${isScrolled ? 'opacity-0 w-0 mr-0' : `opacity-100 mb-1 ${isActive ? 'text-blue-400' : 'text-gray-500'}`}`} />
+                    <Icon className={`w-4 h-4 mb-0.5 transition-all duration-200 ${isScrolled ? 'opacity-0 h-0 mb-0' : 'opacity-100'} ${isActive ? 'text-blue-500 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
                     <span>{category.label}</span>
                   </Link>
                 );
@@ -367,7 +425,7 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
         </div>
       )}
 
-      <div className="h-16"></div>
+      <div className="h-[108px] md:h-16"></div>
     </>
   );
 };

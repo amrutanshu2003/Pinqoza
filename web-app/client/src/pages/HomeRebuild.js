@@ -238,8 +238,8 @@ const HomeRebuild = () => {
       {quickCategories.length > 0 ? (
         <>
           <section className={`fixed top-16 left-0 right-0 z-40 backdrop-blur-md ${isDarkMode ? 'bg-black/90' : 'bg-white/90'}`}>
-          <div className="overflow-x-hidden">
-            <div className={`relative inline-flex min-w-full items-stretch border-b border-gray-200 dark:border-gray-800 ${isCompactTabs ? '' : 'snap-x snap-mandatory'} [scroll-padding-inline:12px]`}>
+          <div className="overflow-x-auto hide-scrollbar">
+            <div className={`relative inline-flex min-w-max items-stretch border-b border-gray-200 dark:border-gray-800 ${isCompactTabs ? '' : 'snap-x snap-mandatory'} [scroll-padding-inline:12px]`}>
               <button
                 type="button"
                 onClick={() => {
@@ -292,8 +292,8 @@ const HomeRebuild = () => {
         </>
       ) : (
         <section className={`fixed top-16 left-0 right-0 z-40 backdrop-blur-md ${isDarkMode ? 'bg-black/90' : 'bg-white/90'}`}>
-          <div className="overflow-x-hidden">
-            <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-200 dark:border-gray-800">
+          <div className="overflow-x-auto hide-scrollbar">
+            <div className="flex w-max items-center gap-3 px-3 py-3 border-b border-gray-200 dark:border-gray-800">
               {Array.from({ length: 6 }).map((_, idx) => (
                 <div
                   key={`cat-skeleton-${idx}`}
@@ -308,7 +308,7 @@ const HomeRebuild = () => {
       )}
 
       {bannerSlides.length > 0 ? (
-        <section className="mt-32 pt-8">
+        <section className="mt-44 pt-8">
           <div
             className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4"
             onMouseEnter={() => setIsBannerHovered(true)}
@@ -386,7 +386,7 @@ const HomeRebuild = () => {
           ) : null}
         </section>
       ) : (
-        <section className="mt-32 pt-8">
+        <section className="mt-44 pt-8">
           <div className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4">
             <div className="flex">
               {Array.from({ length: 3 }).map((_, idx) => (
