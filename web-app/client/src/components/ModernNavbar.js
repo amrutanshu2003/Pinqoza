@@ -251,21 +251,20 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                       {userInitial}
                     </button>
                     {showDesktopAccountMenu && (
-                      <div className="absolute right-0 top-full mt-1 w-56 rounded-2xl border border-white/20 dark:border-white/10 bg-white/55 dark:bg-gray-900/45 backdrop-blur-2xl shadow-[0_20px_50px_-20px_rgba(59,130,246,0.55)] overflow-hidden animate-[fadeIn_.22s_ease-out]">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 via-cyan-400/10 to-purple-500/15 pointer-events-none" />
-                        <Link to="/account" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
-                          <FaRegUserCircle className="w-4 h-4 text-cyan-500" /> Account
+                      <div className="absolute right-0 top-full mt-5 w-56 rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-md shadow-2xl overflow-hidden animate-[fadeIn_.22s_ease-out] z-[120]">
+                        <Link to="/account" className="relative flex items-center gap-3 px-4 py-3 text-sm text-slate-100 hover:bg-cyan-500/15 transition-colors">
+                          <FaRegUserCircle className="w-4 h-4 text-cyan-400" /> Account
                         </Link>
-                        <Link to="/orders" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
-                          <RiFileList3Line className="w-4 h-4 text-amber-500" /> Orders
+                        <Link to="/orders" className="relative flex items-center gap-3 px-4 py-3 text-sm text-slate-100 hover:bg-amber-500/15 transition-colors">
+                          <RiFileList3Line className="w-4 h-4 text-amber-400" /> Orders
                         </Link>
-                        <Link to="/subscriptions" className="relative flex items-center gap-3 px-4 py-3 text-sm text-gray-800 dark:text-gray-100 hover:bg-white/35 dark:hover:bg-white/10 transition-colors">
-                          <TbLayoutGridAdd className="w-4 h-4 text-violet-500" /> Subscription
+                        <Link to="/subscriptions" className="relative flex items-center gap-3 px-4 py-3 text-sm text-slate-100 hover:bg-violet-500/15 transition-colors">
+                          <TbLayoutGridAdd className="w-4 h-4 text-violet-400" /> Subscription
                         </Link>
                         <button
                           type="button"
                           onClick={() => setShowLogoutModal(true)}
-                          className="relative w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50/70 dark:hover:bg-red-500/10 transition-colors"
+                          className="relative w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
                         >
                           <FiLogOut className="w-4 h-4 text-rose-500" /> Logout
                         </button>
@@ -293,8 +292,16 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
             </form>
           </div>
 
-          <div className="md:hidden pb-3 -mx-2 px-2 bg-black">
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-1 border-b border-white/10">
+          <div className={`md:hidden pb-2 -mx-2 px-2 border-b transition-all duration-300 ${
+            isScrolled
+              ? 'bg-white/95 dark:bg-gray-900/95 border-gray-200/70 dark:border-gray-700/70'
+              : 'bg-black border-white/10'
+          }`}>
+            <div className={`flex flex-wrap items-center scrollbar-hide transition-all duration-300 ${
+              isScrolled
+                ? 'gap-2 pb-0.5 overflow-hidden'
+                : 'gap-3 pb-1 overflow-hidden'
+            }`}>
               {categories.map((category) => {
                 const Icon = category.icon;
                 const isActive = activeCategory.toLowerCase() === category.value.toLowerCase();
@@ -302,11 +309,19 @@ const ModernNavbar = ({ cartCount, user, onLogout }) => {
                   <Link
                     key={category.value}
                     to={`/products?category=${encodeURIComponent(category.value)}`}
-                    className={`shrink-0 min-w-[72px] flex flex-col items-center justify-center pt-2 pb-1 text-[12px] font-semibold transition-colors ${
-                      isActive ? 'text-white border-b-2 border-blue-500' : 'text-gray-400 border-b-2 border-transparent'
+                    className={`shrink-0 min-w-[72px] flex items-center justify-center text-[12px] font-semibold transition-all duration-300 ${
+                      isScrolled ? 'px-3 py-1.5 rounded-full border' : 'pt-2 pb-1 border-b-2'
+                    } ${
+                      isActive
+                        ? isScrolled
+                          ? 'text-blue-700 dark:text-blue-300 border-blue-500 bg-blue-50/80 dark:bg-blue-500/10'
+                          : 'text-white border-blue-500'
+                        : isScrolled
+                          ? 'text-gray-700 dark:text-gray-300 border-gray-300/80 dark:border-gray-600'
+                          : 'text-gray-400 border-transparent'
                     }`}
                   >
-                    {!isScrolled && <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-blue-400' : 'text-gray-500'}`} />}
+                    <Icon className={`w-4 h-4 transition-all duration-200 ${isScrolled ? 'opacity-0 w-0 mr-0' : `opacity-100 mb-1 ${isActive ? 'text-blue-400' : 'text-gray-500'}`}`} />
                     <span>{category.label}</span>
                   </Link>
                 );

@@ -161,6 +161,8 @@ const HomeRebuild = () => {
     return () => clearTimeout(t);
   }, [activeIndicatorIndex, isWrapJump, bannerSlides.length]);
 
+  const quickCategories = useMemo(() => categories.slice(0, 8), [categories]);
+
   useEffect(() => {
     const onScroll = () => setIsCompactTabs(window.scrollY > 50);
     onScroll();
@@ -168,14 +170,12 @@ const HomeRebuild = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const quickCategories = useMemo(() => categories.slice(0, 8), [categories]);
   const hasFilters = Boolean(search.trim() || category);
   const activeTabIndex = useMemo(() => {
     if (!category) return 0;
     const idx = quickCategories.findIndex((c) => c === category);
     return idx >= 0 ? idx + 1 : 0;
   }, [category, quickCategories]);
-
   const getCategoryIcon = (cat) => {
     const key = String(cat || '').toLowerCase();
     if (key.includes('milk')) return '🥛';
@@ -221,7 +221,8 @@ const HomeRebuild = () => {
   return (
     <div className="space-y-8">
       {quickCategories.length > 0 ? (
-        <section className={`sticky top-16 z-40 backdrop-blur-md ${isDarkMode ? 'bg-black/90' : 'bg-white/90'}`}>
+        <>
+          <section className={`fixed top-16 left-0 right-0 z-40 backdrop-blur-md ${isDarkMode ? 'bg-black/90' : 'bg-white/90'}`}>
           <div className="overflow-x-hidden">
             <div className={`relative inline-flex min-w-full items-stretch border-b border-gray-200 dark:border-gray-800 ${isCompactTabs ? '' : 'snap-x snap-mandatory'} [scroll-padding-inline:12px]`}>
               <button
@@ -231,11 +232,13 @@ const HomeRebuild = () => {
                   params.delete('category');
                   setSearchParams(params);
                 }}
-                className={`group relative ${isCompactTabs ? '' : 'snap-start'} flex-shrink-0 w-24 px-2 pt-2 pb-3 text-center transition-all duration-300 ${
+                className={`group relative ${isCompactTabs ? '' : 'snap-start'} flex-shrink-0 w-24 px-2 text-center transition-all duration-300 ${
+                  isCompactTabs ? 'pt-2 pb-2' : 'pt-2 pb-3'
+                } ${
                   !category ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
-                <div className={`mx-auto mb-1.5 w-10 h-10 rounded-xl items-center justify-center text-2xl ${isCompactTabs ? 'hidden' : 'flex'} ${!category ? (isDarkMode ? 'bg-white/10' : 'bg-blue-100') : (isDarkMode ? 'bg-white/5' : 'bg-gray-100')}`}>🛍️</div>
+                <div className={`mx-auto w-10 rounded-xl items-center justify-center text-2xl transition-all duration-200 overflow-hidden ${isCompactTabs ? 'h-0 opacity-0 mb-0' : 'h-10 opacity-100 mb-1.5 flex'} ${!category ? (isDarkMode ? 'bg-white/10' : 'bg-blue-100') : (isDarkMode ? 'bg-white/5' : 'bg-gray-100')}`}>🛍️</div>
                 <div className="text-sm leading-tight font-semibold truncate">For You</div>
               </button>
 
@@ -250,11 +253,13 @@ const HomeRebuild = () => {
                       params.set('category', cat);
                       setSearchParams(params);
                     }}
-                    className={`group relative ${isCompactTabs ? '' : 'snap-start'} flex-shrink-0 w-24 px-2 pt-2 pb-3 text-center transition-all duration-300 ${
+                    className={`group relative ${isCompactTabs ? '' : 'snap-start'} flex-shrink-0 w-24 px-2 text-center transition-all duration-300 ${
+                      isCompactTabs ? 'pt-2 pb-2' : 'pt-2 pb-3'
+                    } ${
                       active ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'
                     }`}
                   >
-                    <div className={`mx-auto mb-1.5 w-10 h-10 rounded-xl items-center justify-center text-2xl ${isCompactTabs ? 'hidden' : 'flex'} ${active ? (isDarkMode ? 'bg-white/10' : 'bg-blue-100') : (isDarkMode ? 'bg-white/5' : 'bg-gray-100')}`}>
+                    <div className={`mx-auto w-10 rounded-xl items-center justify-center text-2xl transition-all duration-200 overflow-hidden ${isCompactTabs ? 'h-0 opacity-0 mb-0' : 'h-10 opacity-100 mb-1.5 flex'} ${active ? (isDarkMode ? 'bg-white/10' : 'bg-blue-100') : (isDarkMode ? 'bg-white/5' : 'bg-gray-100')}`}>
                       {getCategoryIcon(cat)}
                     </div>
                     <div className="text-sm leading-tight font-medium truncate">{cat}</div>
@@ -268,11 +273,12 @@ const HomeRebuild = () => {
               />
             </div>
           </div>
-        </section>
+          </section>
+        </>
       ) : null}
 
       {bannerSlides.length > 0 ? (
-        <section className="mt-3">
+        <section className="mt-24">
           <div
             className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4"
             onMouseEnter={() => setIsBannerHovered(true)}
@@ -398,3 +404,4 @@ const HomeRebuild = () => {
 };
 
 export default HomeRebuild;
+
