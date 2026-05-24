@@ -22,6 +22,8 @@ const HomeRebuild = () => {
   const prevIndicatorRef = useRef(0);
   const [wormFromIndex, setWormFromIndex] = useState(0);
   const [isWrapJump, setIsWrapJump] = useState(false);
+  const [dealNow, setDealNow] = useState(Date.now());
+  const dealsScrollRef = useRef(null);
   const touchStartXRef = useRef(null);
   const touchDeltaXRef = useRef(0);
 
@@ -38,6 +40,34 @@ const HomeRebuild = () => {
         })),
     [featured]
   );
+
+  const flashDeals = useMemo(() => {
+    const picks = featured.filter((p) => Number(p?.price) > 0).slice(0, 8);
+    return picks.map((p, idx) => {
+      const discount = [18, 22, 27, 15, 30, 20, 25, 12][idx % 8];
+      const basePrice = Number(p.price);
+      const dealPrice = Math.max(1, Math.round(basePrice * (1 - discount / 100)));
+      const endsAt = Date.now() + (idx + 2) * 60 * 60 * 1000 + (idx % 3) * 17 * 60 * 1000;
+      return {
+        id: p._id || `${p.name}-${idx}`,
+        name: p.name || 'Deal Product',
+        image: p.image || '',
+        discount,
+        originalPrice: basePrice,
+        dealPrice,
+        endsAt,
+        category: p.category || 'deal'
+      };
+    });
+  }, [featured]);
+
+  const formatDealTime = (target, now) => {
+    const diff = Math.max(0, target - now);
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+  };
   const loopPoint = useMemo(() => Math.max(1, bannerSlides.length + 1), [bannerSlides.length]);
   const activeIndicatorIndex = useMemo(
     () => (bannerSlides.length ? ((activeBanner - 1 + bannerSlides.length) % bannerSlides.length) : 0),
@@ -52,6 +82,11 @@ const HomeRebuild = () => {
     }, 3000);
     return () => clearInterval(id);
   }, [bannerSlides.length, isBannerHovered]);
+
+  useEffect(() => {
+    const id = setInterval(() => setDealNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const handleBannerTransitionEnd = () => {
     if (activeBanner < loopPoint) return;
@@ -94,6 +129,13 @@ const HomeRebuild = () => {
 
     touchStartXRef.current = null;
     touchDeltaXRef.current = 0;
+  };
+
+  const scrollDeals = (direction = 'right') => {
+    const el = dealsScrollRef.current;
+    if (!el) return;
+    const amount = Math.max(220, Math.floor(el.clientWidth * 0.75));
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -413,6 +455,92 @@ const HomeRebuild = () => {
       )}
 
       <section>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Flash Deals</h2>
+            <p className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Limited-time prices, grab before timer ends</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/products?sort=price_asc')}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+            >
+              View all
+            </button>
+          </div>
+        </div>
+
+        {flashDeals.length > 0 ? (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => scrollDeals('left')}
+              className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border backdrop-blur-xl flex items-center justify-center text-base shadow-lg transition-all duration-200 ${
+                isDarkMode
+                  ? 'bg-black/40 border-white/20 text-white hover:bg-black/55'
+                  : 'bg-white/60 border-white/60 text-gray-800 hover:bg-white/80'
+              }`}
+              aria-label="Scroll flash deals left"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollDeals('right')}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border backdrop-blur-xl flex items-center justify-center text-base shadow-lg transition-all duration-200 ${
+                isDarkMode
+                  ? 'bg-black/40 border-white/20 text-white hover:bg-black/55'
+                  : 'bg-white/60 border-white/60 text-gray-800 hover:bg-white/80'
+              }`}
+              aria-label="Scroll flash deals right"
+            >
+              ›
+            </button>
+
+            <div ref={dealsScrollRef} className="overflow-x-auto hide-scrollbar -mx-1 px-1">
+            <div className="inline-flex min-w-full gap-3 md:gap-4">
+              {flashDeals.map((deal) => (
+                <button
+                  key={deal.id}
+                  type="button"
+                  onClick={() => navigate('/products?search=' + encodeURIComponent(deal.name))}
+                  className={`group w-[220px] md:w-[250px] shrink-0 rounded-2xl border text-left overflow-hidden ${
+                    isDarkMode ? 'border-white/10 bg-gray-900/90' : 'border-gray-200 bg-white/95'
+                  } shadow-[0_10px_30px_-18px_rgba(249,115,22,0.45)] hover:-translate-y-1 transition-all duration-300`}
+                >
+                  <div className="relative h-28 md:h-32 bg-gradient-to-r from-orange-500 to-amber-500">
+                    <span className="absolute left-2 top-2 px-2 py-1 rounded-full text-[11px] font-extrabold bg-white text-orange-600">
+                      {deal.discount}% OFF
+                    </span>
+                    {deal.image ? (
+                      <img src={deal.image} alt={deal.name} className="absolute right-2 bottom-2 h-20 w-20 object-contain drop-shadow-lg" />
+                    ) : null}
+                  </div>
+                  <div className="p-3">
+                    <div className={`text-[11px] uppercase tracking-wide mb-1 ${isDarkMode ? 'text-orange-300' : 'text-orange-600'}`}>{deal.category}</div>
+                    <div className={`text-sm font-bold line-clamp-2 min-h-[2.5rem] ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{deal.name}</div>
+                    <div className="mt-2 flex items-end gap-2">
+                      <span className={`text-lg font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>₹{deal.dealPrice}</span>
+                      <span className={`text-xs line-through ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>₹{deal.originalPrice}</span>
+                    </div>
+                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-500 text-white text-xs font-bold">
+                      Ends in {formatDealTime(deal.endsAt, dealNow)}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            </div>
+          </div>
+        ) : (
+          <div className={`rounded-xl border p-4 text-sm ${isDarkMode ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-600'}`}>
+            Deals loading...
+          </div>
+        )}
+      </section>
+
+      <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Highlights</h2>
           <button
@@ -479,6 +607,110 @@ const HomeRebuild = () => {
             ))}
           </div>
         )}
+      </section>
+
+      <section className={`rounded-2xl border p-5 md:p-6 ${isDarkMode ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white'}`}>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Stats</h2>
+          <button
+            type="button"
+            onClick={() => navigate('/products?sort=rating_desc')}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+          >
+            Shop top rated
+          </button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: 'Featured Picks', value: featured.length || 0 },
+            { label: 'Categories', value: categories.length || 0 },
+            { label: 'Flash Deals', value: flashDeals.length || 0 },
+            { label: 'Search Results', value: hasFilters ? searchedProducts.length : 'Live' }
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={`rounded-xl border p-4 ${isDarkMode ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-gray-50'}`}
+            >
+              <p className={`text-xs uppercase tracking-wide ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</p>
+              <p className={`mt-2 text-2xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid md:grid-cols-3 gap-4">
+        {[
+          {
+            title: '1. Browse Fast',
+            body: 'Use category tabs and smart filters to reach products quickly.',
+            action: 'Explore catalog',
+            to: '/products'
+          },
+          {
+            title: '2. Add to Cart',
+            body: 'Compare prices and ratings, then add best options instantly.',
+            action: 'Open cart',
+            to: '/cart'
+          },
+          {
+            title: '3. Checkout Securely',
+            body: 'Finish your order with safe payments and quick confirmation.',
+            action: 'Go checkout',
+            to: '/checkout'
+          }
+        ].map((step) => (
+          <div
+            key={step.title}
+            className={`rounded-2xl border p-5 ${isDarkMode ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white'}`}
+          >
+            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
+            <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{step.body}</p>
+            <button
+              type="button"
+              onClick={() => navigate(step.to)}
+              className={`mt-4 text-sm font-semibold ${isDarkMode ? 'text-cyan-300 hover:text-cyan-200' : 'text-blue-700 hover:text-blue-800'}`}
+            >
+              {step.action}
+            </button>
+          </div>
+        ))}
+      </section>
+
+      <section
+        className={`rounded-2xl border p-6 md:p-8 overflow-hidden relative ${
+          isDarkMode ? 'border-cyan-500/30 bg-gradient-to-r from-cyan-900/40 to-blue-900/30' : 'border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50'
+        }`}
+      >
+        <div className="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-cyan-400/20 blur-2xl" aria-hidden="true" />
+        <div className="absolute -left-8 -bottom-12 w-40 h-40 rounded-full bg-blue-500/15 blur-3xl" aria-hidden="true" />
+        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className={`text-2xl md:text-3xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Ready for your next order?
+            </h2>
+            <p className={`mt-2 text-sm md:text-base ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+              Fresh deals update daily. Check new arrivals and grab best prices before stock runs out.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/products?sort=created_desc')}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            >
+              New arrivals
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/wishlist')}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold border ${
+                isDarkMode ? 'border-white/20 text-white hover:bg-white/10' : 'border-blue-300 text-blue-700 hover:bg-white/70'
+              } transition-colors`}
+            >
+              View wishlist
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );

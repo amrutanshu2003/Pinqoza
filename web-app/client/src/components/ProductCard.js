@@ -350,9 +350,9 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
 
   return (
     <div
-      className={`group h-full rounded-2xl overflow-hidden border transition-shadow ${
+      className={`group relative h-full rounded-3xl overflow-hidden border transition-all duration-300 ${
         isDetailView ? '' : 'cursor-pointer'
-      } ${'border-gray-200/70 hover:shadow-lg hover:shadow-black/5 dark:border-white/10 dark:hover:shadow-black/30'} bg-white/90 dark:bg-gray-900/80 backdrop-blur`}
+      } ${'border-gray-200/80 dark:border-white/10 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)] hover:-translate-y-1.5 hover:shadow-[0_24px_55px_-22px_rgba(59,130,246,0.40)]'} bg-white/95 dark:bg-gray-900/85 backdrop-blur-xl`}
       style={{ animationDelay }}
       onClick={handleCardClick}
       role="button"
@@ -361,13 +361,15 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
         if (e.key === 'Enter') handleCardClick();
       }}
     >
+      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-sky-500/15 via-cyan-400/10 to-emerald-400/15 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_42%)] pointer-events-none" />
       <div className="relative bg-gradient-to-br from-gray-50 to-white dark:from-white/5 dark:to-white/0">
-        <div className="aspect-square w-full overflow-hidden">
+        <div className="aspect-square w-full overflow-hidden ring-1 ring-black/5 dark:ring-white/10 rounded-b-2xl">
           {product?.image ? (
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-contain p-5 transition-transform duration-200 group-hover:scale-[1.02]"
+              className="w-full h-full object-contain p-5 transition-transform duration-300 group-hover:scale-[1.08]"
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -385,10 +387,10 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
         <button
           onClick={handleToggleWishlist}
           disabled={wishlistLoading}
-          className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur border transition-colors ${
+          className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur border transition-all duration-200 ${
             isWishlisted
               ? 'bg-red-500 text-white border-red-500 shadow-md shadow-red-500/20'
-              : 'bg-white/90 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 border-gray-200/70 dark:border-white/10 hover:text-red-500'
+              : 'bg-white/90 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 border-gray-200/70 dark:border-white/10 hover:text-red-500 hover:scale-105'
           }`}
           title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
@@ -403,9 +405,9 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
         </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-2">
+      <div className="p-5 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-2">
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${categoryPill}`}>
+          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase ${categoryPill}`}>
             <span aria-hidden>{categoryEmoji}</span>
             <span className="capitalize">{product?.category || 'product'}</span>
           </span>
@@ -422,8 +424,8 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
           <div className="font-semibold text-gray-900 dark:text-white leading-snug line-clamp-2">{product?.name}</div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-600 text-white text-xs font-bold">
+        <div className="flex items-center gap-2.5">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-sm">
             <span>{ratingText}</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.54-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.719c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -432,19 +434,19 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
           <div className="text-xs text-gray-600 dark:text-gray-400">{reviewsCount > 0 ? `${reviewsCount} reviews` : 'No reviews yet'}</div>
         </div>
 
-        <div className="flex items-end justify-between gap-3 pt-1">
+        <div className="flex items-end justify-between gap-3 pt-2">
           <div>
-            <div className="text-xl font-extrabold text-gray-900 dark:text-white">₹{product?.price}</div>
+            <div className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">₹{product?.price}</div>
             <div className="text-xs text-gray-500 dark:text-gray-400">/{product?.unit || 'unit'}</div>
           </div>
 
           <button
             onClick={handleAddToCart}
             disabled={adding || product?.stock === 0}
-            className={`h-10 px-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+            className={`h-10 px-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
               product?.stock === 0
                 ? 'bg-gray-200 text-gray-500 dark:bg-white/10 dark:text-gray-400 cursor-not-allowed'
-                : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900 shadow-sm'
+                : 'bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 hover:from-yellow-500 hover:via-amber-500 hover:to-orange-500 text-gray-900 shadow-sm hover:shadow-md hover:scale-[1.03]'
             }`}
           >
             {adding ? 'Adding…' : 'Add'}
