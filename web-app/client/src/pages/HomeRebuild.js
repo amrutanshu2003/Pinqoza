@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { getFeaturedProducts, getProductCategories, getProducts } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { FiTruck, FiShield, FiRefreshCcw, FiHeadphones, FiArrowUp, FiTag, FiGift, FiClock, FiZap } from 'react-icons/fi';
 
 const HomeRebuild = () => {
   const { isDarkMode } = useTheme();
@@ -14,6 +15,7 @@ const HomeRebuild = () => {
   const [searchedProducts, setSearchedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasBackendIssue, setHasBackendIssue] = useState(false);
   const [isCompactTabs, setIsCompactTabs] = useState(false);
   const [activeBanner, setActiveBanner] = useState(1);
   const [animateBanner, setAnimateBanner] = useState(true);
@@ -23,6 +25,7 @@ const HomeRebuild = () => {
   const [wormFromIndex, setWormFromIndex] = useState(0);
   const [isWrapJump, setIsWrapJump] = useState(false);
   const [dealNow, setDealNow] = useState(Date.now());
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const dealsScrollRef = useRef(null);
   const touchStartXRef = useRef(null);
   const touchDeltaXRef = useRef(0);
@@ -144,6 +147,7 @@ const HomeRebuild = () => {
     const load = async () => {
       try {
         setLoading(true);
+        setHasBackendIssue(false);
         const [featuredRes, categoriesRes] = await Promise.all([
           getFeaturedProducts(),
           getProductCategories()
@@ -155,6 +159,7 @@ const HomeRebuild = () => {
         if (!active) return;
         setFeatured([]);
         setCategories([]);
+        setHasBackendIssue(true);
       } finally {
         if (active) setLoading(false);
       }
@@ -227,6 +232,13 @@ const HomeRebuild = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    const handleBackToTopVisibility = () => setShowBackToTop(window.scrollY > 420);
+    handleBackToTopVisibility();
+    window.addEventListener('scroll', handleBackToTopVisibility, { passive: true });
+    return () => window.removeEventListener('scroll', handleBackToTopVisibility);
+  }, []);
+
   const hasFilters = Boolean(search.trim() || category);
   const activeTabIndex = useMemo(() => {
     if (!category) return 0;
@@ -258,12 +270,14 @@ const HomeRebuild = () => {
       }
       try {
         setLoading(true);
+        setHasBackendIssue(false);
         const res = await getProducts({ search: search.trim(), category, sort: 'rating_desc', limit: 40 });
         if (!active) return;
         setSearchedProducts(Array.isArray(res.data?.products) ? res.data.products : []);
       } catch (error) {
         if (!active) return;
         setSearchedProducts([]);
+        setHasBackendIssue(true);
       } finally {
         if (active) setLoading(false);
       }
@@ -456,19 +470,31 @@ const HomeRebuild = () => {
 
       <section>
         <div className="flex items-center justify-between mb-3">
-          <div>
-            <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Flash Deals</h2>
-            <p className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Limited-time prices, grab before timer ends</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate('/products?sort=price_asc')}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
-            >
-              View all
-            </button>
-          </div>
+          {(loading || hasBackendIssue) ? (
+            <>
+              <div>
+                <div className={`h-7 w-36 rounded-md mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-3 w-56 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
+              <div className={`h-8 w-20 rounded-full skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+            </>
+          ) : (
+            <>
+              <div>
+                <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Flash Deals</h2>
+                <p className={`text-xs md:text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Limited-time prices, grab before timer ends</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate('/products?sort=price_asc')}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+                >
+                  View all
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {flashDeals.length > 0 ? (
@@ -534,22 +560,48 @@ const HomeRebuild = () => {
             </div>
           </div>
         ) : (
-          <div className={`rounded-xl border p-4 text-sm ${isDarkMode ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-600'}`}>
-            Deals loading...
+          <div className="overflow-x-auto hide-scrollbar -mx-1 px-1">
+            <div className="inline-flex min-w-full gap-3 md:gap-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={`deal-skeleton-${i}`}
+                  className={`w-[220px] md:w-[250px] shrink-0 rounded-2xl border overflow-hidden ${
+                    isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'
+                  }`}
+                >
+                  <div className={`h-28 md:h-32 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                  <div className="p-3">
+                    <div className={`h-3 w-16 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                    <div className={`h-4 w-[85%] rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                    <div className={`h-4 w-[70%] rounded mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                    <div className={`h-6 w-24 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </section>
 
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Highlights</h2>
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="text-xs md:text-sm font-semibold px-3 py-1.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-          >
-            Reset
-          </button>
+          {(loading || hasBackendIssue) ? (
+            <>
+              <div className={`h-7 w-40 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              <div className={`h-8 w-20 rounded-full skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+            </>
+          ) : (
+            <>
+              <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Home Highlights</h2>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="text-xs md:text-sm font-semibold px-3 py-1.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                Reset
+              </button>
+            </>
+          )}
         </div>
 
         {loading ? (
@@ -609,109 +661,221 @@ const HomeRebuild = () => {
         )}
       </section>
 
-      <section className={`rounded-2xl border p-5 md:p-6 ${isDarkMode ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white'}`}>
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Stats</h2>
-          <button
-            type="button"
-            onClick={() => navigate('/products?sort=rating_desc')}
-            className="px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
-          >
-            Shop top rated
-          </button>
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          {(loading || hasBackendIssue) ? (
+            <div className={`h-7 w-44 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+          ) : (
+            <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Top Offers For You</h2>
+          )}
         </div>
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: 'Featured Picks', value: featured.length || 0 },
-            { label: 'Categories', value: categories.length || 0 },
-            { label: 'Flash Deals', value: flashDeals.length || 0 },
-            { label: 'Search Results', value: hasFilters ? searchedProducts.length : 'Live' }
-          ].map((item) => (
-            <div
-              key={item.label}
-              className={`rounded-xl border p-4 ${isDarkMode ? 'border-white/10 bg-black/30' : 'border-gray-200 bg-gray-50'}`}
-            >
-              <p className={`text-xs uppercase tracking-wide ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</p>
-              <p className={`mt-2 text-2xl font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.value}</p>
-            </div>
-          ))}
-        </div>
+
+        {(loading || hasBackendIssue) ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={`offer-sk-${i}`} className={`rounded-2xl p-4 border ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}>
+                <div className={`h-4 w-20 rounded mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-6 w-40 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-3 w-full rounded mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-8 w-24 rounded-lg skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { icon: FiTag, title: 'Flat 20% OFF', sub: 'Use code PINQ20 on first order', cta: 'Apply', to: '/products?sort=price_asc', tone: 'from-blue-500 to-cyan-500' },
+              { icon: FiGift, title: 'Buy 2 Get 1', sub: 'Selected dairy combos available now', cta: 'Explore', to: '/products?search=combo', tone: 'from-violet-500 to-fuchsia-500' },
+              { icon: FiClock, title: 'Happy Hours', sub: 'Extra savings from 6PM to 9PM daily', cta: 'Grab Now', to: '/products?search=deal', tone: 'from-amber-500 to-orange-500' }
+            ].map((offer) => {
+              const Icon = offer.icon;
+              return (
+                <button
+                  key={offer.title}
+                  type="button"
+                  onClick={() => navigate(offer.to)}
+                  className={`text-left rounded-2xl p-4 border transition-all hover:-translate-y-0.5 ${
+                    isDarkMode ? 'border-white/10 bg-gray-900/85 hover:bg-gray-900' : 'border-gray-200 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${offer.tone}`}>
+                        <Icon className="w-3.5 h-3.5" />
+                        Offer
+                      </div>
+                      <h3 className={`mt-3 text-lg font-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{offer.title}</h3>
+                      <p className={`mt-1 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{offer.sub}</p>
+                    </div>
+                    <FiZap className={`w-5 h-5 mt-1 ${isDarkMode ? 'text-yellow-300' : 'text-yellow-500'}`} />
+                  </div>
+                  <span className={`mt-3 inline-flex px-3 py-1.5 rounded-lg text-xs font-bold ${
+                    isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {offer.cta}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </section>
 
-      <section className="grid md:grid-cols-3 gap-4">
-        {[
-          {
-            title: '1. Browse Fast',
-            body: 'Use category tabs and smart filters to reach products quickly.',
-            action: 'Explore catalog',
-            to: '/products'
-          },
-          {
-            title: '2. Add to Cart',
-            body: 'Compare prices and ratings, then add best options instantly.',
-            action: 'Open cart',
-            to: '/cart'
-          },
-          {
-            title: '3. Checkout Securely',
-            body: 'Finish your order with safe payments and quick confirmation.',
-            action: 'Go checkout',
-            to: '/checkout'
-          }
-        ].map((step) => (
-          <div
-            key={step.title}
-            className={`rounded-2xl border p-5 ${isDarkMode ? 'border-white/10 bg-gray-900/80' : 'border-gray-200 bg-white'}`}
-          >
-            <h3 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
-            <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{step.body}</p>
-            <button
-              type="button"
-              onClick={() => navigate(step.to)}
-              className={`mt-4 text-sm font-semibold ${isDarkMode ? 'text-cyan-300 hover:text-cyan-200' : 'text-blue-700 hover:text-blue-800'}`}
-            >
-              {step.action}
-            </button>
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          {(loading || hasBackendIssue) ? (
+            <div className={`h-7 w-36 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+          ) : (
+            <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Shop by Need</h2>
+          )}
+        </div>
+
+        {(loading || hasBackendIssue) ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={`need-sk-${i}`} className={`rounded-2xl p-4 border ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}>
+                <div className={`h-10 w-10 rounded-xl mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 w-24 rounded skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'Morning Milk', to: '/products?category=milk', icon: '🥛' },
+              { label: 'Breakfast Picks', to: '/products?search=butter', icon: '🧈' },
+              { label: 'Kids Favorites', to: '/products?search=cheese', icon: '🧀' },
+              { label: 'Premium Daily', to: '/products?search=premium', icon: '⭐' }
+            ].map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => navigate(item.to)}
+                className={`rounded-2xl p-4 border text-left transition-all hover:-translate-y-0.5 ${
+                  isDarkMode ? 'border-white/10 bg-gray-900/85 hover:bg-gray-900' : 'border-gray-200 bg-white hover:bg-gray-50'
+                }`}
+              >
+                <div className="text-2xl">{item.icon}</div>
+                <div className={`mt-2 text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.label}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
-      <section
-        className={`rounded-2xl border p-6 md:p-8 overflow-hidden relative ${
-          isDarkMode ? 'border-cyan-500/30 bg-gradient-to-r from-cyan-900/40 to-blue-900/30' : 'border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50'
-        }`}
-      >
-        <div className="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-cyan-400/20 blur-2xl" aria-hidden="true" />
-        <div className="absolute -left-8 -bottom-12 w-40 h-40 rounded-full bg-blue-500/15 blur-3xl" aria-hidden="true" />
-        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className={`text-2xl md:text-3xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Ready for your next order?
-            </h2>
-            <p className={`mt-2 text-sm md:text-base ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-              Fresh deals update daily. Check new arrivals and grab best prices before stock runs out.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/products?sort=created_desc')}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-            >
-              New arrivals
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/wishlist')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold border ${
-                isDarkMode ? 'border-white/20 text-white hover:bg-white/10' : 'border-blue-300 text-blue-700 hover:bg-white/70'
-              } transition-colors`}
-            >
-              View wishlist
-            </button>
-          </div>
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          {(loading || hasBackendIssue) ? (
+            <>
+              <div className={`h-7 w-36 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              <div className={`h-8 w-24 rounded-full skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+            </>
+          ) : (
+            <>
+              <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Filters</h2>
+              <button
+                type="button"
+                onClick={() => navigate('/products')}
+                className="text-xs md:text-sm font-semibold px-3 py-1.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                View all
+              </button>
+            </>
+          )}
         </div>
+
+        {(loading || hasBackendIssue) ? (
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={`qf-sk-${i}`} className={`h-9 w-28 rounded-full skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'Top Rated', to: '/products?sort=rating_desc' },
+              { label: 'Under ₹99', to: '/products?maxPrice=99' },
+              { label: 'Daily Deals', to: '/products?sort=price_asc' },
+              { label: 'New Arrivals', to: '/products?sort=newest' },
+              { label: 'Best Value', to: '/products?minRating=4' },
+              { label: 'Dairy Essentials', to: '/products?category=milk' },
+              { label: 'Quick Delivery', to: '/products?search=fresh' }
+            ].map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => navigate(chip.to)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+                  isDarkMode
+                    ? 'border-white/15 text-gray-200 bg-white/5 hover:bg-white/10'
+                    : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        )}
       </section>
+
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          {(loading || hasBackendIssue) ? (
+            <div className={`h-7 w-44 rounded-md skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+          ) : (
+            <h2 className={`text-xl md:text-2xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Why Shop With Pinqoza</h2>
+          )}
+        </div>
+
+        {(loading || hasBackendIssue) ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={`svc-sk-${i}`} className={`rounded-2xl p-4 border ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}>
+                <div className={`w-10 h-10 rounded-xl mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 w-28 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-3 w-full rounded skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { icon: FiTruck, title: 'Fast Delivery', desc: 'Same-day slots in selected areas.' },
+              { icon: FiShield, title: 'Quality Checked', desc: 'Every batch is freshness verified.' },
+              { icon: FiRefreshCcw, title: 'Easy Returns', desc: 'Quick replacement for damaged items.' },
+              { icon: FiHeadphones, title: 'Live Support', desc: 'Quick help on call and email.' }
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.title}
+                  className={`rounded-2xl p-4 border transition-all ${
+                    isDarkMode ? 'border-white/10 bg-gray-900/80 hover:bg-gray-900' : 'border-gray-200 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl mb-3 flex items-center justify-center ${isDarkMode ? 'bg-white/10 text-blue-300' : 'bg-blue-50 text-blue-600'}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
+                  <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-24 md:bottom-8 right-4 z-40 w-11 h-11 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+          aria-label="Back to top"
+        >
+          <FiArrowUp className="w-5 h-5" />
+        </button>
+      )}
+
     </div>
   );
 };
