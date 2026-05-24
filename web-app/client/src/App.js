@@ -29,6 +29,7 @@ import RecipeCollection from './pages/RecipeCollection';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Footer from './components/Footer';
+import ProductDetail from './pages/ProductDetail';
 import { getCart } from './services/api';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider, useCart } from './context/CartContext';
@@ -136,7 +137,7 @@ function AppContent() {
           <Route path="/products" element={<Products />} />
           <Route path="/admin" element={<NotFound />} />
           <Route path={`${ADMIN_PATH}/*`} element={<Admin />} />
-          <Route path="/product/:id" element={<Navigate to="/" replace />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/festival-special" element={<FestivalSpecial />} />
           <Route path="/seasonal-dairy" element={<SeasonalDairy />} />
           <Route path="/limited-edition" element={<LimitedEdition />} />
@@ -171,8 +172,8 @@ function AppContent() {
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </main>
-        <Footer />
+      </main>
+      <Footer />
         <ToastContainer toasts={toasts} removeToast={removeToast} />
       </div>
   );

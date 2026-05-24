@@ -58,7 +58,8 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
 
   const handleCardClick = () => {
     if (isDetailView) return;
-    navigate(`/?search=${encodeURIComponent(product?.name || '')}`);
+    if (!product?._id) return;
+    navigate(`/product/${product._id}`);
   };
 
   const handleAddToCart = async (e) => {
