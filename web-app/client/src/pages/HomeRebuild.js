@@ -429,12 +429,16 @@ const HomeRebuild = () => {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={`prod-loading-skeleton-${i}`}
-                className={`rounded-xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+                className={`rounded-2xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
               >
-                <div className={`h-40 rounded-lg mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-40 rounded-xl mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-3 rounded mb-2 w-1/2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
                 <div className={`h-4 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
                 <div className={`h-4 rounded w-2/3 mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
-                <div className={`h-9 rounded-lg skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className="flex items-end justify-between">
+                  <div className={`h-7 rounded w-16 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                  <div className={`h-9 rounded-xl w-20 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                </div>
               </div>
             ))}
           </div>
@@ -461,12 +465,16 @@ const HomeRebuild = () => {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={`prod-skeleton-${i}`}
-                className={`rounded-xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+                className={`rounded-2xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
               >
-                <div className={`h-40 rounded-lg mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-40 rounded-xl mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-3 rounded mb-2 w-1/2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
                 <div className={`h-4 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
                 <div className={`h-4 rounded w-2/3 mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
-                <div className={`h-9 rounded-lg skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className="flex items-end justify-between">
+                  <div className={`h-7 rounded w-16 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                  <div className={`h-9 rounded-xl w-20 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                </div>
               </div>
             ))}
           </div>

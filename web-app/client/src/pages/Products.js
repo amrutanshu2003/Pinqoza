@@ -14,22 +14,52 @@ const Products = () => {
   const category = searchParams.get('category') || '';
 
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [homeFeed, setHomeFeed] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasBackendIssue, setHasBackendIssue] = useState(false);
   const { socket } = useSocket();
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes products-skeleton-shimmer {
+        0% { background-position: -220% 0; }
+        100% { background-position: 220% 0; }
+      }
+      .products-skeleton-shimmer {
+        background: linear-gradient(100deg, var(--ps-1) 20%, var(--ps-2) 40%, var(--ps-1) 60%);
+        background-size: 220% 100%;
+        animation: products-skeleton-shimmer 2.8s linear infinite;
+      }
+      .products-skeleton-dark {
+        --ps-1: rgba(255,255,255,0.03);
+        --ps-2: rgba(255,255,255,0.12);
+      }
+      .products-skeleton-light {
+        --ps-1: rgba(107,114,128,0.08);
+        --ps-2: rgba(107,114,128,0.2);
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     let active = true;
 
     const loadCategories = async () => {
       try {
+        setCategoriesLoading(true);
         const res = await getProductCategories();
         if (!active) return;
         setCategories(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         if (!active) return;
         setCategories([]);
+      } finally {
+        if (active) setCategoriesLoading(false);
       }
     };
 
@@ -45,6 +75,7 @@ const Products = () => {
     const load = async () => {
       try {
         setLoading(true);
+        setHasBackendIssue(false);
 
         if (!search.trim() && !category) {
           const feedRes = await getFeaturedProducts();
@@ -61,6 +92,7 @@ const Products = () => {
         if (!active) return;
         setProducts([]);
         setHomeFeed([]);
+        setHasBackendIssue(true);
       } finally {
         if (active) setLoading(false);
       }
@@ -102,7 +134,10 @@ const Products = () => {
     };
   }, [socket]);
 
-  const visibleProducts = useMemo(() => (search.trim() || category ? products : []), [search, category, products]);
+  const visibleProducts = useMemo(
+    () => (search.trim() || category ? products : homeFeed),
+    [search, category, products, homeFeed]
+  );
 
   const setCategory = (cat) => {
     const params = new URLSearchParams(searchParams);
@@ -120,9 +155,6 @@ const Products = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold">Products</h1>
-            <p className={`mt-1 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Dedicated product detail page nahi hai. Search ya category se listing khulegi.
-            </p>
           </div>
           <button
             type="button"
@@ -133,7 +165,18 @@ const Products = () => {
           </button>
         </div>
 
-        {categories.length > 0 ? (
+        {categoriesLoading || hasBackendIssue ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {Array.from({ length: 8 }).map((_, idx) => (
+              <span
+                key={`cat-chip-skeleton-${idx}`}
+                className={`h-8 w-20 rounded-lg border ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+              >
+                <span className={`block h-full w-full rounded-lg products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+              </span>
+            ))}
+          </div>
+        ) : categories.length > 0 ? (
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
@@ -142,7 +185,7 @@ const Products = () => {
             >
               All
             </button>
-            {categories.slice(0, 10).map((cat) => (
+            {categories.slice(0, 12).map((cat) => (
               <button
                 key={cat}
                 type="button"
@@ -154,6 +197,7 @@ const Products = () => {
             ))}
           </div>
         ) : null}
+
       </section>
 
       <section>
@@ -163,14 +207,24 @@ const Products = () => {
           </p>
         ) : null}
 
-        {!hasFilters ? (
-          <div className={`rounded-xl border p-8 text-center ${isDarkMode ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-600'}`}>
-            Product dekhne ke liye search karo ya category select karo.
-          </div>
-        ) : loading ? (
+        {loading || hasBackendIssue ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className={`h-64 rounded-xl animate-pulse ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`} />
+              <div
+                key={`products-skeleton-${i}`}
+                className={`rounded-2xl border p-3 ${
+                  isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'
+                }`}
+              >
+                <div className={`h-40 rounded-xl mb-3 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                <div className={`h-3 rounded mb-2 w-1/2 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                <div className={`h-4 rounded mb-2 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                <div className={`h-4 rounded w-2/3 mb-3 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                <div className="flex items-end justify-between">
+                  <div className={`h-7 rounded w-16 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                  <div className={`h-9 rounded-xl w-20 products-skeleton-shimmer ${isDarkMode ? 'products-skeleton-dark' : 'products-skeleton-light'}`} />
+                </div>
+              </div>
             ))}
           </div>
         ) : visibleProducts.length > 0 ? (
@@ -179,11 +233,7 @@ const Products = () => {
               <ProductCard key={product._id || idx} product={product} index={idx} />
             ))}
           </div>
-        ) : (
-          <div className={`rounded-xl border p-8 text-center ${isDarkMode ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-600'}`}>
-            Koi product nahi mila.
-          </div>
-        )}
+        ) : null}
       </section>
     </div>
   );
