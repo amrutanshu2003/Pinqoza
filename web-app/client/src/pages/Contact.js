@@ -56,7 +56,7 @@ const Contact = () => {
           <div className="mt-8 grid gap-4">
             <div className={`rounded-2xl p-4 border ${isDarkMode ? 'border-gray-800 bg-black/40' : 'border-gray-200 bg-gray-50'}`}>
               <div className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Email</div>
-              <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>amrutanshu20003@gmail.com</div>
+              <div className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>pinqoza.support@gmail.com</div>
             </div>
           </div>
 

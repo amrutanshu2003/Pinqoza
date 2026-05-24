@@ -2236,7 +2236,7 @@ const Subscriptions = () => {
 
               {/* Email */}
               <a
-                href="mailto:support@pinqoza.com"
+                href="mailto:pinqoza.support@gmail.com"
                 className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02] ${
                   isDarkMode
                     ? 'bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20'
@@ -2250,7 +2250,7 @@ const Subscriptions = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Email Support</h3>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>support@pinqoza.com</p>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>pinqoza.support@gmail.com</p>
                 </div>
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -2286,3 +2286,4 @@ const Subscriptions = () => {
 }
 
 export default Subscriptions;
+

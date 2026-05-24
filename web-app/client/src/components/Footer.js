@@ -127,7 +127,7 @@ const Footer = () => {
               {[
                 { icon: '📍', text: 'Mumbai, Maharashtra, India' },
                 { icon: '📞', text: '+91 98765 43210' },
-                { icon: '✉️', text: 'support@pinqoza.com' }
+                { icon: '✉️', text: 'pinqoza.support@gmail.com' }
               ].map((contact, index) => (
                 <li 
                   key={index}
@@ -169,3 +169,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
