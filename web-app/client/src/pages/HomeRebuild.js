@@ -33,15 +33,16 @@ const HomeRebuild = () => {
         id: p._id || p.name,
         title: p.name || 'Featured Product',
         subtitle: p.category || 'Top picks',
-        image: p.image
+        image: p.image,
+        isFallback: false
       }));
 
     if (list.length >= 3) return list;
     return [
       ...list,
-      { id: 'fallback-1', title: 'Best Deals Live', subtitle: 'Fresh picks for you', image: '/icon.svg' },
-      { id: 'fallback-2', title: 'Trending Products', subtitle: 'Grab top offers', image: '/icon.svg' },
-      { id: 'fallback-3', title: 'New Arrivals', subtitle: 'Shop latest collection', image: '/icon.svg' }
+      { id: 'fallback-1', title: 'Best Deals Live', subtitle: 'Fresh picks for you', image: '/icon.svg', isFallback: true },
+      { id: 'fallback-2', title: 'Trending Products', subtitle: 'Grab top offers', image: '/icon.svg', isFallback: true },
+      { id: 'fallback-3', title: 'New Arrivals', subtitle: 'Shop latest collection', image: '/icon.svg', isFallback: true }
     ].slice(0, 3);
   }, [featured]);
   const loopPoint = useMemo(() => Math.max(1, bannerSlides.length + 1), [bannerSlides.length]);
@@ -278,7 +279,7 @@ const HomeRebuild = () => {
       ) : null}
 
       {bannerSlides.length > 0 ? (
-        <section className="mt-24">
+        <section className="mt-32 pt-8">
           <div
             className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4"
             onMouseEnter={() => setIsBannerHovered(true)}
@@ -301,7 +302,23 @@ const HomeRebuild = () => {
                       isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-white'
                     } hover:shadow-[0_14px_35px_-18px_rgba(59,130,246,0.45)]`}
                   >
-                    <img src={slide.image} alt={slide.title} className="w-full h-40 md:h-56 object-cover" />
+                    {slide.isFallback && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#0b3b8f] via-[#0f6ccf] to-[#20a4df]" />
+                    )}
+                    {slide.isFallback && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                        <img src="/icon.svg" alt="" className="w-44 h-44 md:w-56 md:h-56 object-contain" />
+                      </div>
+                    )}
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className={`w-full h-40 md:h-56 object-cover ${slide.isFallback ? 'opacity-0' : ''}`}
+                      onError={(e) => {
+                        e.currentTarget.src = '/icon.svg';
+                        e.currentTarget.classList.add('opacity-0');
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
                     <div className="pointer-events-none absolute inset-0 ring-1 ring-white/0 transition-all duration-500 group-hover:ring-white/20" />
                     <div className="absolute left-5 md:left-7 top-1/2 -translate-y-1/2 text-white">
