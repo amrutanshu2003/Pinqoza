@@ -25,26 +25,19 @@ const HomeRebuild = () => {
   const touchStartXRef = useRef(null);
   const touchDeltaXRef = useRef(0);
 
-  const bannerSlides = useMemo(() => {
-    const list = featured
-      .filter((p) => p?.image)
-      .slice(0, 6)
-      .map((p) => ({
-        id: p._id || p.name,
-        title: p.name || 'Featured Product',
-        subtitle: p.category || 'Top picks',
-        image: p.image,
-        isFallback: false
-      }));
-
-    if (list.length >= 3) return list;
-    return [
-      ...list,
-      { id: 'fallback-1', title: 'Best Deals Live', subtitle: 'Fresh picks for you', image: '/icon.svg', isFallback: true },
-      { id: 'fallback-2', title: 'Trending Products', subtitle: 'Grab top offers', image: '/icon.svg', isFallback: true },
-      { id: 'fallback-3', title: 'New Arrivals', subtitle: 'Shop latest collection', image: '/icon.svg', isFallback: true }
-    ].slice(0, 3);
-  }, [featured]);
+  const bannerSlides = useMemo(
+    () =>
+      featured
+        .filter((p) => p?.image)
+        .slice(0, 6)
+        .map((p) => ({
+          id: p._id || p.name,
+          title: p.name || 'Featured Product',
+          subtitle: p.category || 'Top picks',
+          image: p.image
+        })),
+    [featured]
+  );
   const loopPoint = useMemo(() => Math.max(1, bannerSlides.length + 1), [bannerSlides.length]);
   const activeIndicatorIndex = useMemo(
     () => (bannerSlides.length ? ((activeBanner - 1 + bannerSlides.length) % bannerSlides.length) : 0),
@@ -136,6 +129,27 @@ const HomeRebuild = () => {
     style.textContent = `
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      @keyframes skeleton-shimmer {
+        0% { background-position: -220% 0; }
+        100% { background-position: 220% 0; }
+      }
+      .skeleton-shimmer {
+        background: linear-gradient(100deg, var(--sk-1) 20%, var(--sk-2) 40%, var(--sk-1) 60%);
+        background-size: 220% 100%;
+        animation: skeleton-shimmer 3.2s linear infinite;
+        animation-delay: 0s;
+      }
+      .skeleton-dark {
+        --sk-1: rgba(255,255,255,0.03);
+        --sk-2: rgba(255,255,255,0.12);
+      }
+      .skeleton-light {
+        --sk-1: rgba(107,114,128,0.08);
+        --sk-2: rgba(107,114,128,0.2);
+      }
+      .skeleton-chip {
+        border-radius: 10px;
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
@@ -276,7 +290,22 @@ const HomeRebuild = () => {
           </div>
           </section>
         </>
-      ) : null}
+      ) : (
+        <section className={`fixed top-16 left-0 right-0 z-40 backdrop-blur-md ${isDarkMode ? 'bg-black/90' : 'bg-white/90'}`}>
+          <div className="overflow-x-hidden">
+            <div className="flex items-center gap-3 px-3 py-3 border-b border-gray-200 dark:border-gray-800">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div
+                  key={`cat-skeleton-${idx}`}
+                  className={`skeleton-chip h-10 w-20 flex-shrink-0 border ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+                >
+                  <div className={`h-full w-full rounded-[10px] skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {bannerSlides.length > 0 ? (
         <section className="mt-32 pt-8">
@@ -302,23 +331,7 @@ const HomeRebuild = () => {
                       isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-white'
                     } hover:shadow-[0_14px_35px_-18px_rgba(59,130,246,0.45)]`}
                   >
-                    {slide.isFallback && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#0b3b8f] via-[#0f6ccf] to-[#20a4df]" />
-                    )}
-                    {slide.isFallback && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                        <img src="/icon.svg" alt="" className="w-44 h-44 md:w-56 md:h-56 object-contain" />
-                      </div>
-                    )}
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className={`w-full h-40 md:h-56 object-cover ${slide.isFallback ? 'opacity-0' : ''}`}
-                      onError={(e) => {
-                        e.currentTarget.src = '/icon.svg';
-                        e.currentTarget.classList.add('opacity-0');
-                      }}
-                    />
+                    <img src={slide.image} alt={slide.title} className="w-full h-40 md:h-56 object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
                     <div className="pointer-events-none absolute inset-0 ring-1 ring-white/0 transition-all duration-500 group-hover:ring-white/20" />
                     <div className="absolute left-5 md:left-7 top-1/2 -translate-y-1/2 text-white">
@@ -372,7 +385,32 @@ const HomeRebuild = () => {
             </div>
           ) : null}
         </section>
-      ) : null}
+      ) : (
+        <section className="mt-32 pt-8">
+          <div className="overflow-hidden -mx-5 sm:-mx-7 lg:-mx-10 px-2 sm:px-3 lg:px-4">
+            <div className="flex">
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div key={`banner-skeleton-${idx}`} className="w-1/3 flex-shrink-0 px-2 md:px-2.5">
+                  <div className={`relative w-full h-40 md:h-56 rounded-2xl border overflow-hidden ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}>
+                    <div className={`absolute inset-0 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                    <div className="absolute left-5 md:left-7 top-1/2 -translate-y-1/2 w-[52%] space-y-3">
+                      <div className={`h-6 rounded-md ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
+                      <div className={`h-4 rounded-md w-[72%] ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-2.5 flex justify-center">
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-gray-500/50" />
+              <span className="h-1.5 w-4 rounded-full bg-gray-400/80" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gray-500/50" />
+            </div>
+          </div>
+        </section>
+      )}
 
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -388,8 +426,16 @@ const HomeRebuild = () => {
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className={`h-64 rounded-xl animate-pulse ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`} />
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={`prod-loading-skeleton-${i}`}
+                className={`rounded-xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+              >
+                <div className={`h-40 rounded-lg mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 rounded w-2/3 mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-9 rounded-lg skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
             ))}
           </div>
         ) : hasFilters ? (
@@ -411,8 +457,18 @@ const HomeRebuild = () => {
             ))}
           </div>
         ) : (
-          <div className={`rounded-xl border p-6 text-center ${isDarkMode ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-600'}`}>
-            Products abhi empty hain. Naye products add hone ke baad yahan show honge.
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={`prod-skeleton-${i}`}
+                className={`rounded-xl border p-3 ${isDarkMode ? 'border-white/10 bg-gray-900' : 'border-gray-200 bg-gray-100'}`}
+              >
+                <div className={`h-40 rounded-lg mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 rounded mb-2 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-4 rounded w-2/3 mb-3 skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+                <div className={`h-9 rounded-lg skeleton-shimmer ${isDarkMode ? 'skeleton-dark' : 'skeleton-light'}`} />
+              </div>
+            ))}
           </div>
         )}
       </section>
