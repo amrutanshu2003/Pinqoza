@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   getProductById, 
   getProducts, 
+  getWishlist,
   toggleWishlist,
   getProductQuestions,
   askQuestion,
@@ -78,6 +79,7 @@ const ProductDetail = () => {
     if (product) {
       fetchSimilarProducts();
       fetchQuestions();
+      syncWishlistState();
     }
   }, [product]);
 
@@ -287,6 +289,36 @@ const ProductDetail = () => {
     navigate('/checkout');
   };
 
+  const syncWishlistState = async () => {
+    if (!product?._id || !isAuthenticated()) {
+      setIsWishlisted(false);
+      return;
+    }
+    try {
+      const res = await getWishlist();
+      const data = res?.data;
+      const items = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.items)
+          ? data.items
+          : Array.isArray(data?.wishlist)
+            ? data.wishlist
+            : [];
+      const found = items.some((item) => {
+        const itemProductId =
+          typeof item === 'string'
+            ? item
+            : typeof item?.product === 'string'
+              ? item.product
+              : item?.product?._id || item?._id;
+        return String(itemProductId) === String(product._id);
+      });
+      setIsWishlisted(found);
+    } catch (error) {
+      setIsWishlisted(false);
+    }
+  };
+
   const handleToggleWishlist = async () => {
     if (!isAuthenticated()) {
       navigate('/login');
@@ -295,8 +327,14 @@ const ProductDetail = () => {
     try {
       setWishlistLoading(true);
       await toggleWishlist(product._id);
-      setIsWishlisted(!isWishlisted);
-      showSuccessToast(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+      const next = !isWishlisted;
+      setIsWishlisted(next);
+      window.dispatchEvent(
+        new CustomEvent('wishlist-updated', {
+          detail: { productId: String(product._id), isWishlisted: next }
+        })
+      );
+      showSuccessToast(next ? 'Added to wishlist' : 'Removed from wishlist');
     } catch (error) {
       console.error('Wishlist error:', error);
       showErrorToast('Failed to update wishlist');

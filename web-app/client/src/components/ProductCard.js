@@ -1,9 +1,70 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addToCart, toggleWishlist } from '../services/api';
+import { addToCart, getWishlist, toggleWishlist } from '../services/api';
 import { isAuthenticated } from '../util/auth';
 import useToast from '../hooks/useToast';
 import { useCart } from '../context/CartContext';
+
+let wishlistCacheIds = null;
+let wishlistCachePromise = null;
+
+if (typeof window !== 'undefined' && !window.__mmWishlistCacheHooked) {
+  window.addEventListener('wishlist-updated', () => {
+    wishlistCacheIds = null;
+    wishlistCachePromise = null;
+  });
+  window.__mmWishlistCacheHooked = true;
+}
+
+const getItemProductId = (item) => {
+  if (!item) return null;
+  if (typeof item === 'string') return item;
+  if (item.product && typeof item.product === 'string') return item.product;
+  if (item.product && typeof item.product === 'object') return item.product._id || item.product.id || null;
+  return item._id || item.id || null;
+};
+
+const normalizeWishlistIds = (payload) => {
+  const source = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.items)
+      ? payload.items
+      : Array.isArray(payload?.wishlist)
+        ? payload.wishlist
+        : [];
+
+  return new Set(
+    source
+      .map(getItemProductId)
+      .filter(Boolean)
+      .map((id) => String(id))
+  );
+};
+
+const ensureWishlistCache = async (force = false) => {
+  if (!isAuthenticated()) {
+    wishlistCacheIds = new Set();
+    return wishlistCacheIds;
+  }
+
+  if (!force && wishlistCacheIds) return wishlistCacheIds;
+  if (!force && wishlistCachePromise) return wishlistCachePromise;
+
+  wishlistCachePromise = getWishlist()
+    .then((res) => {
+      wishlistCacheIds = normalizeWishlistIds(res?.data);
+      return wishlistCacheIds;
+    })
+    .catch(() => {
+      wishlistCacheIds = new Set();
+      return wishlistCacheIds;
+    })
+    .finally(() => {
+      wishlistCachePromise = null;
+    });
+
+  return wishlistCachePromise;
+};
 
 const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, variant = 'grid' }) => {
   const [adding, setAdding] = useState(false);
@@ -15,6 +76,33 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
   const navigate = useNavigate();
 
   const animationDelay = `${index * 0.04}s`;
+
+  React.useEffect(() => {
+    let active = true;
+    const productId = product?._id ? String(product._id) : null;
+
+    if (!productId || !isAuthenticated()) {
+      setIsWishlisted(false);
+      return undefined;
+    }
+
+    ensureWishlistCache().then((ids) => {
+      if (!active) return;
+      setIsWishlisted(ids.has(productId));
+    });
+
+    const onWishlistUpdated = (event) => {
+      const updatedId = String(event?.detail?.productId || '');
+      if (!updatedId || updatedId !== productId) return;
+      setIsWishlisted(Boolean(event?.detail?.isWishlisted));
+    };
+
+    window.addEventListener('wishlist-updated', onWishlistUpdated);
+    return () => {
+      active = false;
+      window.removeEventListener('wishlist-updated', onWishlistUpdated);
+    };
+  }, [product?._id]);
 
   const categoryEmoji = useMemo(() => {
     const emojis = {
@@ -97,7 +185,20 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
     try {
       setWishlistLoading(true);
       await toggleWishlist(product._id);
-      setIsWishlisted((v) => !v);
+      const next = !isWishlisted;
+      setIsWishlisted(next);
+
+      const id = String(product._id);
+      const ids = (await ensureWishlistCache()) || new Set();
+      if (next) ids.add(id);
+      else ids.delete(id);
+      wishlistCacheIds = ids;
+
+      window.dispatchEvent(
+        new CustomEvent('wishlist-updated', {
+          detail: { productId: id, isWishlisted: next }
+        })
+      );
     } catch (error) {
       showErrorToast('Wishlist error. Please try again.');
     } finally {

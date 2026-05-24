@@ -58,39 +58,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     window.addEventListener('storage', handleStorageChange);
-
-    // Log out user when navigating back before the login history entry.
-    const handlePopState = (e) => {
-      // If there's no state or our login marker is missing while we are authenticated, logout.
-      if (!e.state || !e.state.mm_logged_in) {
-        const token = localStorage.getItem('token');
-        if (!token) return; // already logged out
-        // Use existing logout to clear data and notify other components
-        logout();
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
-  // Enhance login to mark history so back navigation logs out
-  const originalLogin = login;
-  const enhancedLogin = (userData) => {
-    originalLogin(userData);
-    try {
-      // push a history entry marking the login state
-      window.history.pushState({ mm_logged_in: true }, '');
-    } catch (e) {
-      // ignore
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login: enhancedLogin, logout, checkAuthStatus }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, checkAuthStatus }}>
       {children}
     </AuthContext.Provider>
   );

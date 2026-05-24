@@ -72,6 +72,11 @@ const Wishlist = () => {
   const handleRemove = async (productId) => {
     try {
       await removeFromWishlist(productId);
+      window.dispatchEvent(
+        new CustomEvent('wishlist-updated', {
+          detail: { productId: String(productId), isWishlisted: false }
+        })
+      );
       fetchWishlist();
     } catch (error) {
       console.error('Error removing from wishlist:', error);
@@ -82,6 +87,11 @@ const Wishlist = () => {
     try {
       await addToCart(productId, 1);
       await removeFromWishlist(productId);
+      window.dispatchEvent(
+        new CustomEvent('wishlist-updated', {
+          detail: { productId: String(productId), isWishlisted: false }
+        })
+      );
       navigate('/cart');
     } catch (error) {
       console.error('Error moving to cart:', error);
