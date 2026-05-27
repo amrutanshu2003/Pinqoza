@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 
@@ -12,10 +12,10 @@ const HomeRebuild = () => {
   ];
 
   const categories = [
-    { name: 'Daily Essentials', emoji: '??' },
-    { name: 'Premium Dairy', emoji: '??' },
-    { name: 'Family Combos', emoji: '??' },
-    { name: 'Healthy Picks', emoji: '??' }
+    { name: 'Daily Essentials', emoji: '🛒' },
+    { name: 'Premium Dairy', emoji: '🥛' },
+    { name: 'Family Combos', emoji: '🎁' },
+    { name: 'Healthy Picks', emoji: '🥗' }
   ];
 
   return (

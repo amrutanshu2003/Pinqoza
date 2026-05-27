@@ -1,10 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 
 const Footer = () => {
-  const { isDarkMode } = useTheme();
-
   return (
     <footer className="mt-14 border-t border-black/5 dark:border-white/10 bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
@@ -53,7 +50,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-5 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p className="text-xs text-slate-500 dark:text-slate-400">� {new Date().getFullYear()} Pinqoza. All rights reserved.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">© {new Date().getFullYear()} Pinqoza. All rights reserved.</p>
           <p className="text-xs text-slate-500 dark:text-slate-400">Crafted for real-world growth and customer delight.</p>
         </div>
       </div>

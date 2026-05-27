@@ -1,9 +1,8 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import React, { useEffect, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import ModernNavbar from './components/ModernNavbar';
 import Footer from './components/Footer';
 import ADMIN_PATH from './config/adminPath';
-import { getCart } from './services/api';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
