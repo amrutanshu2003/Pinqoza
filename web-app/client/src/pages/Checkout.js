@@ -610,7 +610,7 @@ const Checkout = () => {
                       name="street"
                       value={formData.street}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                       placeholder="House No., Street Name, Area"
                       required
                     />
@@ -626,7 +626,7 @@ const Checkout = () => {
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                         placeholder="City"
                         required
                       />
@@ -640,7 +640,7 @@ const Checkout = () => {
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                         placeholder="State"
                       />
                     </div>
@@ -656,7 +656,7 @@ const Checkout = () => {
                         name="pincode"
                         value={formData.pincode}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                        className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                         placeholder="Pincode"
                         required
                       />
@@ -670,7 +670,7 @@ const Checkout = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                       placeholder="Phone Number"
                       required
                     />
@@ -688,7 +688,7 @@ const Checkout = () => {
                   value={formData.notes}
                   onChange={handleChange}
                   rows={3}
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all duration-200`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-800'} premium-input`}
                   placeholder="Special instructions for delivery..."
                 />
               </div>

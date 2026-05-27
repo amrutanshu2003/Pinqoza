@@ -1,35 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import ModernNavbar from './components/ModernNavbar';
-import HomeRebuild from './pages/HomeRebuild';
-import Products from './pages/Products';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import GoogleOAuthCallback from './pages/GoogleOAuthCallback';
-import Register from './pages/Register';
-import RegisterVerifyEmail from './pages/RegisterVerifyEmail';
-import Account from './pages/Account';
-import Subscriptions from './pages/Subscriptions';
-import Orders from './pages/Orders';
-import Success from './pages/Success';
-import OrderSuccess from './pages/OrderSuccess';
-import OrderDetails from './pages/OrderDetails';
-import Wishlist from './pages/Wishlist';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Admin from './pages/Admin';
-import NotFound from './pages/NotFound';
-import ADMIN_PATH from './config/adminPath';
-import Profile from './pages/Profile';
-import FestivalSpecial from './pages/FestivalSpecial';
-import SeasonalDairy from './pages/SeasonalDairy';
-import LimitedEdition from './pages/LimitedEdition';
-import RecipeCollection from './pages/RecipeCollection';
-import About from './pages/About';
-import Contact from './pages/Contact';
 import Footer from './components/Footer';
-import ProductDetail from './pages/ProductDetail';
+import ADMIN_PATH from './config/adminPath';
 import { getCart } from './services/api';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider, useCart } from './context/CartContext';
@@ -37,6 +10,33 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { ToastContainer } from './components/ToastNotification';
+
+// Lazy load pages for better performance
+const HomeRebuild = React.lazy(() => import('./pages/HomeRebuild'));
+const Cart = React.lazy(() => import('./pages/Cart'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const Login = React.lazy(() => import('./pages/Login'));
+const GoogleOAuthCallback = React.lazy(() => import('./pages/GoogleOAuthCallback'));
+const Register = React.lazy(() => import('./pages/Register'));
+const RegisterVerifyEmail = React.lazy(() => import('./pages/RegisterVerifyEmail'));
+const Account = React.lazy(() => import('./pages/Account'));
+const Subscriptions = React.lazy(() => import('./pages/Subscriptions'));
+const Orders = React.lazy(() => import('./pages/Orders'));
+const Success = React.lazy(() => import('./pages/Success'));
+const OrderSuccess = React.lazy(() => import('./pages/OrderSuccess'));
+const OrderDetails = React.lazy(() => import('./pages/OrderDetails'));
+const Wishlist = React.lazy(() => import('./pages/Wishlist'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const FestivalSpecial = React.lazy(() => import('./pages/FestivalSpecial'));
+const SeasonalDairy = React.lazy(() => import('./pages/SeasonalDairy'));
+const LimitedEdition = React.lazy(() => import('./pages/LimitedEdition'));
+const RecipeCollection = React.lazy(() => import('./pages/RecipeCollection'));
+const About = React.lazy(() => import('./pages/About'));
+const Contact = React.lazy(() => import('./pages/Contact'));
 
 function AppContent() {
   const { cartCount, updateCartCount } = useCart();
@@ -130,24 +130,26 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black">
-      <ModernNavbar user={user} onLogout={handleLogout} cartCount={cartCount} />
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-24 md:pb-8">
-        <Routes>
-          <Route path="/" element={<HomeRebuild />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/admin" element={<NotFound />} />
-          <Route path={`${ADMIN_PATH}/*`} element={<Admin />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/festival-special" element={<FestivalSpecial />} />
-          <Route path="/seasonal-dairy" element={<SeasonalDairy />} />
-          <Route path="/limited-edition" element={<LimitedEdition />} />
-          <Route path="/recipe-collection" element={<RecipeCollection />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/oauth/google/callback" element={<GoogleOAuthCallback onLogin={handleLogin} />} />
+      <ModernNavbar user={user} cartCount={cartCount} onLogout={handleLogout} />
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <Suspense fallback={
+          <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<HomeRebuild />} />
+            <Route path="/admin" element={<NotFound />} />
+            <Route path={`${ADMIN_PATH}/*`} element={<Admin />} />
+            <Route path="/festival-special" element={<FestivalSpecial />} />
+            <Route path="/seasonal-dairy" element={<SeasonalDairy />} />
+            <Route path="/limited-edition" element={<LimitedEdition />} />
+            <Route path="/recipe-collection" element={<RecipeCollection />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/oauth/google/callback" element={<GoogleOAuthCallback onLogin={handleLogin} />} />
             <Route 
               path="/register" 
               element={<Register />} 
@@ -172,10 +174,11 @@ function AppContent() {
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+        </Suspense>
       </main>
       <Footer />
-        <ToastContainer toasts={toasts} removeToast={removeToast} />
-      </div>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    </div>
   );
 }
 

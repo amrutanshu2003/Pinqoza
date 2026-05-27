@@ -350,10 +350,11 @@ const ProductCard = ({ product, onCartUpdate, index = 0, isDetailView = false, v
 
   return (
     <div
-      className={`group relative h-full rounded-3xl overflow-hidden border transition-all duration-300 ${
+      className={`group relative h-full rounded-3xl overflow-hidden border ${
         isDetailView ? '' : 'cursor-pointer'
-      } ${'border-gray-200/80 dark:border-white/10 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)] hover:-translate-y-1.5 hover:shadow-[0_24px_55px_-22px_rgba(59,130,246,0.40)]'} bg-white/95 dark:bg-gray-900/85 backdrop-blur-xl`}
+      } border-gray-200/80 dark:border-white/10 bg-white/95 dark:bg-gray-900/85 backdrop-blur-xl premium-glow-hover`}
       style={{ animationDelay }}
+
       onClick={handleCardClick}
       role="button"
       tabIndex={0}

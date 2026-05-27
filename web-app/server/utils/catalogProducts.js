@@ -28,6 +28,11 @@ const CATEGORIES = [
   'health',
   'automotive',
   'office',
+  'beverages',
+  'bakery',
+  'medicines',
+  'garden',
+  'gaming',
   'other'
 ];
 
@@ -59,6 +64,11 @@ const CATEGORY_META = {
   health: { unit: 'pc', price: [49, 4999], color: '#f0fdfa', accent: '#0f766e', icon: 'HEALTH' },
   automotive: { unit: 'pc', price: [129, 12999], color: '#f8fafc', accent: '#334155', icon: 'AUTO' },
   office: { unit: 'pc', price: [39, 6999], color: '#eef2ff', accent: '#1d4ed8', icon: 'OFFICE' },
+  beverages: { unit: 'L', price: [20, 350], color: '#ffedd5', accent: '#ea580c', icon: 'DRINKS' },
+  bakery: { unit: 'pack', price: [15, 250], color: '#fef3c7', accent: '#b45309', icon: 'BAKERY' },
+  medicines: { unit: 'pack', price: [10, 1500], color: '#ecfeff', accent: '#0891b2', icon: 'MEDS' },
+  garden: { unit: 'pc', price: [29, 3999], color: '#f0fdf4', accent: '#16a34a', icon: 'GARDEN' },
+  gaming: { unit: 'pc', price: [199, 49999], color: '#faf5ff', accent: '#7c3aed', icon: 'GAME' },
   other: { unit: 'pc', price: [49, 1999], color: '#f3f4f6', accent: '#374151', icon: 'ITEM' }
 };
 
@@ -90,6 +100,11 @@ const TAXONOMY = {
   health: { subcategories: ['vitamins', 'protein', 'personal-care', 'medical-supplies'], products: ['Multivitamin', 'Protein Powder', 'Hand Sanitizer', 'Digital Thermometer', 'Blood Pressure Monitor'] },
   automotive: { subcategories: ['car-care', 'bike-accessories', 'lubricants'], products: ['Engine Oil', 'Car Shampoo', 'Bike Cover', 'Air Pump', 'Helmet'] },
   office: { subcategories: ['stationery', 'printing', 'office-electronics'], products: ['Notebook', 'Pen Pack', 'Printer Paper', 'Calculator', 'Desk Organizer'] },
+  beverages: { subcategories: ['juices', 'soda', 'tea-coffee', 'energy-drinks'], products: ['Orange Juice', 'Apple Juice', 'Cola Can', 'Club Soda', 'Green Tea Pack', 'Instant Coffee', 'Energy Drink'] },
+  bakery: { subcategories: ['bread', 'cookies', 'croissants', 'buns', 'muffins'], products: ['Whole Wheat Bread', 'Chocolate Chip Cookies', 'Butter Croissant', 'Burger Buns', 'Blueberry Muffin'] },
+  medicines: { subcategories: ['first-aid', 'pain-relief', 'cold-flu', 'supplements'], products: ['Bandage Kit', 'Paracetamol Tablets', 'Cough Syrup', 'Vitamin C Capsules', 'Calcium Tablets'] },
+  garden: { subcategories: ['plants', 'seeds', 'pots-planters', 'garden-tools'], products: ['Indoor Palm Plant', 'Tomato Seeds Pack', 'Ceramic Planter Pot', 'Pruning Shears', 'Watering Can'] },
+  gaming: { subcategories: ['consoles', 'controllers', 'games', 'accessories'], products: ['Gaming Console', 'Wireless Controller', 'Action RPG Game', 'Gaming Headset', 'RGB Mouse Pad'] },
   other: { subcategories: ['general'], products: ['General Utility Item'] }
 };
 
@@ -139,6 +154,159 @@ const productImageDataUri = (category, subcategory, name, brand) => {
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 };
 
+const getProductRealImage = (category, subcategory, name, index) => {
+  const imagesMap = {
+    milk: [
+      'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800&q=80',
+      'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=800&q=80',
+      'https://images.unsplash.com/photo-1528498033053-40b95230eb19?w=800&q=80'
+    ],
+    ghee: [
+      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=800&q=80',
+      'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=800&q=80'
+    ],
+    cheese: [
+      'https://images.unsplash.com/photo-1486299267070-83823f5448dd?w=800&q=80',
+      'https://images.unsplash.com/photo-1552763442-15967bf092e5?w=800&q=80',
+      'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=800&q=80'
+    ],
+    butter: [
+      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=800&q=80'
+    ],
+    curd: [
+      'https://images.unsplash.com/photo-1571244856353-fb5ee46a782e?w=800&q=80'
+    ],
+    paneer: [
+      'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=800&q=80'
+    ],
+    cream: [
+      'https://images.unsplash.com/photo-1500595046783-ed23777169a5?w=800&q=80'
+    ],
+    yogurt: [
+      'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80'
+    ],
+    lassi: [
+      'https://images.unsplash.com/photo-1571244856353-fb5ee46a782e?w=800&q=80'
+    ],
+    buttermilk: [
+      'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800&q=80'
+    ],
+    sweets: [
+      'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?w=800&q=80'
+    ],
+    cake: [
+      'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80',
+      'https://images.unsplash.com/photo-1535141192574-5d4897c13636?w=800&q=80',
+      'https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=800&q=80'
+    ],
+    groceries: [
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80',
+      'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=800&q=80',
+      'https://images.unsplash.com/photo-1583258292688-d0213df4a3a8?w=800&q=80'
+    ],
+    fashion: [
+      'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80',
+      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&q=80',
+      'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80'
+    ],
+    electronics: [
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+      'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&q=80',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&q=80'
+    ],
+    home: [
+      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80',
+      'https://images.unsplash.com/photo-1582582621959-48d27397dc7b?w=800&q=80'
+    ],
+    beauty: [
+      'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80',
+      'https://images.unsplash.com/photo-1620916566399-39f1143a6f2e?w=800&q=80'
+    ],
+    accessories: [
+      'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80',
+      'https://images.unsplash.com/photo-1514474959185-1472d4b3e0b7?w=800&q=80'
+    ],
+    kitchen: [
+      'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80'
+    ],
+    sports: [
+      'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&q=80',
+      'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&q=80'
+    ],
+    books: [
+      'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80'
+    ],
+    toys: [
+      'https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=800&q=80'
+    ],
+    baby: [
+      'https://images.unsplash.com/photo-1515488042361-404e9250afef?w=800&q=80'
+    ],
+    pet: [
+      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800&q=80'
+    ],
+    health: [
+      'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=800&q=80'
+    ],
+    automotive: [
+      'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800&q=80'
+    ],
+    office: [
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
+    ],
+    beverages: [
+      'https://images.unsplash.com/photo-1534080355125-27a68ed880e2?w=800&q=80',
+      'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80',
+      'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80'
+    ],
+    bakery: [
+      'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80',
+      'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80',
+      'https://images.unsplash.com/photo-1558961309-dbdf71791454?w=800&q=80'
+    ],
+    medicines: [
+      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
+      'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&q=80'
+    ],
+    garden: [
+      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80',
+      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+      'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=800&q=80'
+    ],
+    gaming: [
+      'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&q=80',
+      'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80',
+      'https://images.unsplash.com/photo-1600861195091-690c92f1d2cc?w=800&q=80'
+    ],
+    other: [
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80'
+    ]
+  };
+
+  const lowerName = String(name || '').toLowerCase();
+  
+  if (lowerName.includes('juice')) return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80';
+  if (lowerName.includes('coffee')) return 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=800&q=80';
+  if (lowerName.includes('tea')) return 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80';
+  if (lowerName.includes('bread')) return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80';
+  if (lowerName.includes('cookie') || lowerName.includes('biscuit')) return 'https://images.unsplash.com/photo-1499636136210-6f4ee912704e?w=800&q=80';
+  if (lowerName.includes('muffin') || lowerName.includes('cupcake')) return 'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=800&q=80';
+  if (lowerName.includes('console')) return 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80';
+  if (lowerName.includes('controller')) return 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&q=80';
+  if (lowerName.includes('earbuds') || lowerName.includes('headset') || lowerName.includes('audio')) return 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80';
+  if (lowerName.includes('t-shirt') || lowerName.includes('shirt')) return 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&q=80';
+  if (lowerName.includes('jeans')) return 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80';
+  if (lowerName.includes('sneakers') || lowerName.includes('shoe')) return 'https://images.unsplash.com/photo-1528701800489-20be3c2ea1ae?w=800&q=80';
+  if (lowerName.includes('rice')) return 'https://images.unsplash.com/photo-1604908554105-088645debe26?w=800&q=80';
+  if (lowerName.includes('oil')) return 'https://images.unsplash.com/photo-1627485937980-7d2c10a4112b?w=800&q=80';
+  if (lowerName.includes('plant')) return 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80';
+  if (lowerName.includes('seeds')) return 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80';
+  if (lowerName.includes('paracetamol') || lowerName.includes('tablet') || lowerName.includes('capsule')) return 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80';
+
+  const categoryImages = imagesMap[category] || imagesMap.other;
+  return categoryImages[index % categoryImages.length];
+};
+
 const normalizeProduct = (raw, index = 0) => {
   const category = CATEGORIES.includes(String(raw.category || '').trim()) ? String(raw.category).trim() : 'other';
   const taxonomy = TAXONOMY[category] || TAXONOMY.other;
@@ -149,7 +317,7 @@ const normalizeProduct = (raw, index = 0) => {
   const defaultName = `${brand} ${pick(taxonomy.products, index)} ${pick(SIZE_POOL, index)}`;
   const name = String(raw.name || defaultName).trim();
   const slug = slugify(raw.slug || `${brand}-${name}`);
-  const image = String(raw.image || '').trim() || productImageDataUri(category, subcategory, name, brand);
+  const image = String(raw.image || '').trim() || getProductRealImage(category, subcategory, name, index);
   const unit = ['L', 'kg', 'pc', 'pack'].includes(raw.unit) ? raw.unit : CATEGORY_META[category]?.unit || 'pc';
 
   return {
