@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { getOrderById } from '../services/api';
+import SUCCESS_PATH from '../config/successPath';
 
 const CODVerificationPopup = ({ orderId }) => {
-  console.log('🔍 CODVerificationPopup rendered with orderId:', orderId);
+  console.log('ðŸ” CODVerificationPopup rendered with orderId:', orderId);
   
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +17,7 @@ const CODVerificationPopup = ({ orderId }) => {
       
       // If order is confirmed, redirect to success page
       if (orderData.status === 'confirmed' || orderData.orderPlaced === true) {
-        window.location.href = '/success?orderId=' + orderId + '&fromVerification=true';
+        window.location.href = `${SUCCESS_PATH}?orderId=${orderId}&fromVerification=true`;
       }
     } catch (error) {
       console.error('Error fetching order status:', error);
@@ -188,7 +189,7 @@ const CODVerificationPopup = ({ orderId }) => {
               </div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-600">Amount:</span>
-                <span className="font-semibold text-green-600">₹{order.totalPrice}</span>
+                <span className="font-semibold text-green-600">â‚¹{order.totalPrice}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Payment:</span>
@@ -222,7 +223,7 @@ const CODVerificationPopup = ({ orderId }) => {
           {/* Warning message */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
             <div className="flex items-start space-x-2">
-              <span className="text-yellow-500 text-lg">⚠️</span>
+              <span className="text-yellow-500 text-lg">âš ï¸</span>
               <div className="text-left">
                 <p className="text-sm text-yellow-800 font-medium">Please Do Not Close This Window</p>
                 <p className="text-xs text-yellow-700 mt-1">
@@ -250,3 +251,4 @@ const CODVerificationPopup = ({ orderId }) => {
 };
 
 export default CODVerificationPopup;
+

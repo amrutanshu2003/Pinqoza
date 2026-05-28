@@ -1,91 +1,199 @@
-﻿import React from 'react';
-import { Link } from 'react-router-dom';
+﻿import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { getFeaturedProducts, getProductCategories } from '../services/api';
+import ProductCard from '../components/ProductCard';
 import { useTheme } from '../context/ThemeContext';
 
 const HomeRebuild = () => {
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
 
-  const highlights = [
-    { title: 'Fast Delivery', desc: 'Order aaj, same-day doorstep delivery.' },
-    { title: 'Fresh Quality', desc: 'Daily-checked products with premium quality.' },
-    { title: 'Best Value', desc: 'Smart bundles, better prices, real savings.' }
-  ];
+  const [loading, setLoading] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchDraft, setSearchDraft] = useState('');
 
-  const categories = [
-    { name: 'Daily Essentials', emoji: '🛒' },
-    { name: 'Premium Dairy', emoji: '🥛' },
-    { name: 'Family Combos', emoji: '🎁' },
-    { name: 'Healthy Picks', emoji: '🥗' }
-  ];
+  const categoryChips = useMemo(
+    () => [
+      { key: 'groceries', label: 'Groceries', emoji: '🛒' },
+      { key: 'fashion', label: 'Fashion', emoji: '👕' },
+      { key: 'electronics', label: 'Electronics', emoji: '📱' },
+      { key: 'home', label: 'Home', emoji: '🏠' },
+      { key: 'beauty', label: 'Beauty', emoji: '🧴' }
+    ],
+    []
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const [featuredRes, categoriesRes] = await Promise.all([getFeaturedProducts(), getProductCategories()]);
+        if (!mounted) return;
+        setFeaturedProducts(Array.isArray(featuredRes.data) ? featuredRes.data : []);
+        setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
+      } catch (e) {
+        if (!mounted) return;
+        setFeaturedProducts([]);
+        setCategories([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const goToProducts = (params) => {
+    const sp = new URLSearchParams(params);
+    setSearchParams(sp);
+    navigate(`/products?${sp.toString()}`);
+  };
+
+  const visibleCategories = useMemo(() => {
+    const preferred = new Set(categoryChips.map((c) => c.key));
+    const extra = categories.filter((c) => !preferred.has(c)).slice(0, 6);
+    return [...categoryChips, ...extra.map((c) => ({ key: c, label: c, emoji: '🛍️' }))];
+  }, [categories, categoryChips]);
 
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-cyan-400/25 blur-3xl animate-blob" />
-      <div className="absolute -bottom-24 -right-20 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl animate-blob animation-delay-2000" />
+    <div className="space-y-10">
+      <section className={`rounded-3xl overflow-hidden border ${isDarkMode ? 'border-white/10 bg-gray-900/60' : 'border-gray-200 bg-white'}`}>
+        <div className="p-8 md:p-12">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Pinqoza Marketplace</div>
+              <h1 className={`mt-2 text-3xl md:text-5xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Shop everything you need, in one place.
+              </h1>
+              <p className={`mt-4 text-base md:text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Groceries, fashion, electronics, home, beauty and more. Fast delivery and great deals.
+              </p>
 
-      <section className="relative rounded-3xl border border-white/30 dark:border-white/10 bg-gradient-to-br from-cyan-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-6 md:p-10 shadow-xl">
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <p className="inline-flex px-3 py-1 rounded-full text-xs font-bold tracking-wider bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-              TRUSTED BY MODERN FAMILIES
-            </p>
-            <h1 className="mt-4 text-3xl md:text-5xl font-black leading-tight text-slate-900 dark:text-white">
-              Make Shopping Feel
-              <span className="block text-cyan-600 dark:text-cyan-400">Effortless & Premium</span>
-            </h1>
-            <p className="mt-4 text-slate-600 dark:text-slate-300 text-sm md:text-base max-w-xl">
-              Pinqoza is designed to feel smooth, fast, and delightful so users stay longer, trust faster, and buy confidently.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/register" className="px-5 py-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-bold">
-                Start Shopping
-              </Link>
-              <Link to="/subscriptions" className="px-5 py-3 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold text-slate-700 dark:text-slate-100">
-                View Membership Plans
-              </Link>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const q = searchDraft.trim();
+                  if (!q) return;
+                  goToProducts({ search: q });
+                }}
+                className="mt-6"
+              >
+                <div className={`flex items-center gap-2 p-2 rounded-2xl border ${isDarkMode ? 'border-white/10 bg-black/40' : 'border-gray-200 bg-gray-50'}`}>
+                  <input
+                    value={searchDraft}
+                    onChange={(e) => setSearchDraft(e.target.value)}
+                    placeholder="Search products, brands, categories..."
+                    className={`flex-1 bg-transparent outline-none px-3 py-2 ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+                  />
+                  <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold">
+                    Search
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {categoryChips.map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    onClick={() => goToProducts({ category: c.key })}
+                    className={`px-3 py-2 rounded-xl text-sm font-semibold border transition ${
+                      isDarkMode ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-gray-200 text-gray-800 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className="mr-2">{c.emoji}</span>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={`w-full md:w-[380px] rounded-3xl border overflow-hidden ${isDarkMode ? 'border-white/10 bg-black/40' : 'border-gray-200 bg-gray-50'}`}>
+              <div className="p-6">
+                <div className="inline-flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
+                  ⚡ TOP DEALS
+                </div>
+                <div className={`mt-3 text-2xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Save more everyday</div>
+                <div className={`mt-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Discover trending items and best-value picks across categories.
+                </div>
+                <div className="mt-5 flex gap-3">
+                  <Link to="/products?sort=price_asc" className="flex-1 text-center px-4 py-2 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold">
+                    View Deals
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className={`flex-1 text-center px-4 py-2 rounded-2xl font-semibold border ${
+                      isDarkMode ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-gray-300 text-gray-800 hover:bg-white'
+                    }`}
+                  >
+                    Support
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2 rounded-2xl p-5 bg-slate-900 text-white dark:bg-slate-800 shadow-lg">
-              <p className="text-xs uppercase tracking-wider text-cyan-300">Today Special</p>
-              <h3 className="mt-2 text-2xl font-black">Fresh Deals Zone</h3>
-              <p className="mt-1 text-sm text-slate-200">Smart bundles crafted for family savings.</p>
-            </div>
-            {highlights.map((item) => (
-              <div key={item.title} className="rounded-2xl p-4 bg-white/80 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60">
-                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">{item.title}</h4>
-                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">{item.desc}</p>
+      <section>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className={`text-sm font-bold tracking-wide ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>CATEGORIES</div>
+            <h2 className={`mt-1 text-2xl md:text-3xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Top Categories</h2>
+          </div>
+          <Link to="/products" className={`text-sm font-semibold ${isDarkMode ? 'text-gray-200 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}>
+            View all
+          </Link>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {visibleCategories.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => goToProducts({ category: c.key })}
+              className={`px-4 py-2 rounded-2xl text-sm font-semibold border transition ${
+                isDarkMode ? 'border-white/10 text-gray-200 hover:bg-white/5' : 'border-gray-200 text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              <span className="mr-2">{c.emoji}</span>
+              <span className="capitalize">{c.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className={`text-sm font-bold tracking-wide ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>TRENDING</div>
+            <h2 className={`mt-1 text-2xl md:text-3xl font-extrabold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Trending Now</h2>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className={`mt-4 rounded-2xl p-10 text-center ${isDarkMode ? 'bg-gray-900/60 border border-white/10 text-gray-200' : 'bg-white border border-gray-200 text-gray-700'}`}>
+            Loading...
+          </div>
+        ) : featuredProducts.length ? (
+          <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {featuredProducts.slice(0, 8).map((p, idx) => (
+              <div key={p._id} className={`${isDarkMode ? 'bg-gray-900/40' : 'bg-white'} rounded-2xl border ${isDarkMode ? 'border-white/10' : 'border-gray-200'} overflow-hidden`}>
+                <ProductCard product={p} index={idx} />
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {categories.map((cat, idx) => (
-          <div
-            key={cat.name}
-            className="rounded-2xl p-4 border border-slate-200 dark:border-slate-700 bg-white/85 dark:bg-slate-900/75 hover:-translate-y-1 transition-transform duration-300"
-            style={{ animationDelay: `${idx * 100}ms` }}
-          >
-            <div className="text-2xl">{cat.emoji}</div>
-            <h3 className="mt-2 text-sm font-extrabold text-slate-900 dark:text-white">{cat.name}</h3>
-            <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">Curated for speed, quality, and repeat orders.</p>
+        ) : (
+          <div className={`mt-4 rounded-2xl p-10 text-center ${isDarkMode ? 'bg-gray-900/60 border border-white/10 text-gray-200' : 'bg-white border border-gray-200 text-gray-700'}`}>
+            No trending products yet.
           </div>
-        ))}
-      </section>
-
-      <section className="mt-8 rounded-3xl p-6 md:p-8 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-black">Build trust. Increase retention. Grow sales.</h2>
-            <p className="mt-2 text-sm text-blue-100">Exactly the kind of real-world experience that keeps people coming back.</p>
-          </div>
-          <Link to="/contact" className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white text-slate-900 font-bold text-sm">
-            Contact Pinqoza Team
-          </Link>
-        </div>
+        )}
       </section>
     </div>
   );

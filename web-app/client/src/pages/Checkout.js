@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   createOrder,
@@ -17,6 +17,7 @@ import CODVerificationPopup from '../components/CODVerificationPopup';
 import { isAuthenticated } from '../util/auth';
 import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
+import SUCCESS_PATH from '../config/successPath';
 
 const Checkout = () => {
   const { isDarkMode } = useTheme();
@@ -79,20 +80,20 @@ const Checkout = () => {
   // Get emoji for each category
   const getCategoryEmoji = (category) => {
     const emojis = {
-      milk: '🥛',
-      ghee: '🍯',
-      cheese: '🧀',
-      butter: '🧈',
-      curd: '🥣',
-      paneer: '🧊',
-      cream: '🍦',
-      yogurt: '🍶',
-      lassi: '🥤',
-      buttermilk: '🫙',
-      sweets: '🍬',
-      cake: '🍰'
+      milk: 'ðŸ¥›',
+      ghee: 'ðŸ¯',
+      cheese: 'ðŸ§€',
+      butter: 'ðŸ§ˆ',
+      curd: 'ðŸ¥£',
+      paneer: 'ðŸ§Š',
+      cream: 'ðŸ¦',
+      yogurt: 'ðŸ¶',
+      lassi: 'ðŸ¥¤',
+      buttermilk: 'ðŸ«™',
+      sweets: 'ðŸ¬',
+      cake: 'ðŸ°'
     };
-    return emojis[category] || '🥛';
+    return emojis[category] || 'ðŸ¥›';
   };
 
   // Derive category from product name if not available
@@ -352,17 +353,17 @@ const Checkout = () => {
       const newOrderId = res.data._id;
       setOrderId(newOrderId);
       
-      console.log('🔍 Order created successfully:', newOrderId);
-      console.log('🔍 Payment method check:', formData.paymentMethod);
+      console.log('ðŸ” Order created successfully:', newOrderId);
+      console.log('ðŸ” Payment method check:', formData.paymentMethod);
       
       if (formData.paymentMethod === 'online') {
         // Show QR code for online payment
-        console.log('🔍 Showing QR code for online payment');
+        console.log('ðŸ” Showing QR code for online payment');
         setShowQRCode(true);
       } else if (formData.paymentMethod === 'cod') {
         // For COD, show verification popup immediately
-        console.log('🔍 COD order placed, showing verification popup');
-        console.log('🔍 Order ID:', newOrderId);
+        console.log('ðŸ” COD order placed, showing verification popup');
+        console.log('ðŸ” Order ID:', newOrderId);
         await clearCart();
         updateCartCount();
         // Clear selected items from sessionStorage
@@ -370,17 +371,17 @@ const Checkout = () => {
         // Show COD verification popup instead of redirecting
         setShowCODVerification(true);
         setCODOrderId(newOrderId);
-        console.log('🔍 setShowCODVerification called, CODOrderId set to:', newOrderId);
-        console.log('🔍 showCODVerification state should now be true');
+        console.log('ðŸ” setShowCODVerification called, CODOrderId set to:', newOrderId);
+        console.log('ðŸ” showCODVerification state should now be true');
       } else if (formData.paymentMethod === 'subscription') {
         // For subscription, redirect to subscription plans page
-        console.log('🔍 Subscription payment method selected, redirecting to subscription plans');
+        console.log('ðŸ” Subscription payment method selected, redirecting to subscription plans');
         navigate('/');
       } else {
-        console.log('🔍 Unknown payment method:', formData.paymentMethod);
+        console.log('ðŸ” Unknown payment method:', formData.paymentMethod);
       }
     } catch (error) {
-      console.error('🔍 Error creating order:', error);
+      console.error('ðŸ” Error creating order:', error);
       alert(error.response?.data?.message || 'Error creating order');
     } finally {
       setSubmitting(false);
@@ -409,7 +410,7 @@ const Checkout = () => {
       // Clear selected items from sessionStorage
       sessionStorage.removeItem('selectedItems');
       setShowQRCode(false);
-      navigate('/success', { state: { orderId } });
+      navigate(SUCCESS_PATH, { state: { orderId } });
     } catch (error) {
       console.error('Error completing payment:', error);
     }
@@ -736,7 +737,7 @@ const Checkout = () => {
                         <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Cash on Delivery</span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>Popular</span>
                       </div>
-                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pay when you receive your order • Admin confirmation required</p>
+                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pay when you receive your order â€¢ Admin confirmation required</p>
                     </div>
                     <div className={`w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-center`}>
                       <svg className={`w-6 h-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -812,7 +813,7 @@ const Checkout = () => {
                         <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Premium Subscription</span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white`}>Best Value</span>
                       </div>
-                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Get exclusive discounts & free delivery • Admin verification required</p>
+                      <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Get exclusive discounts & free delivery â€¢ Admin verification required</p>
                     </div>
                     <div className={`w-12 h-12 rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-center`}>
                       <svg className={`w-6 h-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -875,7 +876,7 @@ const Checkout = () => {
                         <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>x {item.quantity}</p>
                       </div>
                     </div>
-                    <span className={`font-bold text-sm sm:text-base text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{item.price * item.quantity}</span>
+                    <span className={`font-bold text-sm sm:text-base text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>â‚¹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
@@ -883,7 +884,7 @@ const Checkout = () => {
               <div className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} pt-6 space-y-4`}>
                 <div className="flex justify-between items-center gap-3">
                   <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Subtotal</span>
-                  <span className={`font-medium text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>₹{cart.totalPrice}</span>
+                  <span className={`font-medium text-right break-words ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>â‚¹{cart.totalPrice}</span>
                 </div>
 
                 {/* Coupon */}
@@ -909,7 +910,7 @@ const Checkout = () => {
                   {couponDiscount > 0 && (
                     <div className="flex justify-between items-center mt-3">
                       <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Discount</span>
-                      <span className="font-bold text-green-600 dark:text-green-400">-₹{couponDiscount}</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">-â‚¹{couponDiscount}</span>
                     </div>
                   )}
                 </div>
@@ -918,7 +919,7 @@ const Checkout = () => {
                 <div className={`rounded-2xl p-4 border ${isDarkMode ? 'border-white/10 bg-gray-900/20' : 'border-gray-200 bg-white/50'}`}>
                   <p className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Loyalty Points</p>
                   <p className={`text-sm mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Available: {user?.loyaltyPoints || 0} (1 point = ₹1)
+                    Available: {user?.loyaltyPoints || 0} (1 point = â‚¹1)
                   </p>
                   <input
                     type="number"
@@ -936,7 +937,7 @@ const Checkout = () => {
                   {pointsToRedeem > 0 && (
                     <div className="flex justify-between items-center mt-3">
                       <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Redeemed</span>
-                      <span className="font-bold text-green-600 dark:text-green-400">-₹{pointsToRedeem}</span>
+                      <span className="font-bold text-green-600 dark:text-green-400">-â‚¹{pointsToRedeem}</span>
                     </div>
                   )}
                 </div>
@@ -949,7 +950,7 @@ const Checkout = () => {
                   <div className="flex justify-between items-center gap-3">
                     <span className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Total</span>
                     <span className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-primary-400 text-right break-words">
-                      ₹{Math.max(0, (cart.totalPrice || 0) - (couponDiscount || 0) - (pointsToRedeem || 0))}
+                      â‚¹{Math.max(0, (cart.totalPrice || 0) - (couponDiscount || 0) - (pointsToRedeem || 0))}
                     </span>
                   </div>
                 </div>
@@ -1001,7 +1002,7 @@ const Checkout = () => {
                     isDarkMode ? 'border-white/10 text-gray-200 hover:bg-gray-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   } disabled:opacity-50`}
                 >
-                  ✕
+                  âœ•
                 </button>
               </div>
 
@@ -1118,7 +1119,7 @@ const Checkout = () => {
                   disabled={addressBusy}
                   className="px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 text-white hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50"
                 >
-                  {addressBusy ? 'Saving…' : 'Save Address'}
+                  {addressBusy ? 'Savingâ€¦' : 'Save Address'}
                 </button>
               </div>
             </div>
@@ -1148,3 +1149,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+

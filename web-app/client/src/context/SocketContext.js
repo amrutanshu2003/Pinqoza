@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+﻿import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
@@ -16,38 +16,34 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Initialize socket connection
     const newSocket = io(process.env.REACT_APP_API_URL || 'http://localhost:5000', {
       withCredentials: true,
       transports: ['websocket', 'polling']
     });
 
-    // Connection event listeners
     newSocket.on('connect', () => {
-      console.log('🔌 Connected to server');
+      console.log('Socket connected');
       setIsConnected(true);
     });
 
     newSocket.on('disconnect', () => {
-      console.log('🔌 Disconnected from server');
+      console.log('Socket disconnected');
       setIsConnected(false);
     });
 
     setSocket(newSocket);
 
-    // Cleanup on unmount
     return () => {
       newSocket.close();
     };
   }, []);
 
-  // Join user room when authenticated
-  const joinUserRoom = (userId) => {
+  const joinUserRoom = useCallback((userId) => {
     if (socket && userId) {
       socket.emit('joinUserRoom', userId);
-      console.log(`👤 Joined user room: ${userId}`);
+      console.log(`Joined user room: ${userId}`);
     }
-  };
+  }, [socket]);
 
   const value = {
     socket,

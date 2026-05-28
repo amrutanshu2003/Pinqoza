@@ -1,8 +1,9 @@
-import React, { useEffect, Suspense } from 'react';
+﻿import React, { useEffect, Suspense, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import ModernNavbar from './components/ModernNavbar';
 import Footer from './components/Footer';
 import ADMIN_PATH from './config/adminPath';
+import SUCCESS_PATH from './config/successPath';
 import { ThemeProvider } from './context/ThemeContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -10,8 +11,8 @@ import { SocketProvider, useSocket } from './context/SocketContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { ToastContainer } from './components/ToastNotification';
 
-// Lazy load pages for better performance
 const HomeRebuild = React.lazy(() => import('./pages/HomeRebuild'));
+const Products = React.lazy(() => import('./pages/Products'));
 const Cart = React.lazy(() => import('./pages/Cart'));
 const Checkout = React.lazy(() => import('./pages/Checkout'));
 const Login = React.lazy(() => import('./pages/Login'));
@@ -38,105 +39,68 @@ const About = React.lazy(() => import('./pages/About'));
 const Contact = React.lazy(() => import('./pages/Contact'));
 
 function AppContent() {
-  const { cartCount, updateCartCount } = useCart();
+  const { updateCartCount } = useCart();
   const { user, isAuthenticated, login, logout } = useAuth();
   const { socket, joinUserRoom } = useSocket();
   const { success, toasts, removeToast } = useToast();
   const navigate = useNavigate();
+  const joinedRoomUserIdRef = useRef('');
 
   useEffect(() => {
     if (isAuthenticated) {
-      updateCartCount(); // Update cart count when app loads with existing user
-      // Join user's personal room for real-time notifications
-      if (user && user._id) {
-        joinUserRoom(user._id);
+      updateCartCount();
+      const userId = user?._id ? String(user._id) : '';
+      if (userId && joinedRoomUserIdRef.current !== userId) {
+        joinUserRoom(userId);
+        joinedRoomUserIdRef.current = userId;
       }
     }
-  }, [isAuthenticated, user, joinUserRoom]);
+  }, [isAuthenticated, user?._id, joinUserRoom, updateCartCount]);
 
   useEffect(() => {
-    const handleLoggedOut = () => {
-      navigate('/login', { replace: true });
-    };
-
+    const handleLoggedOut = () => navigate('/login', { replace: true });
     window.addEventListener('mm_logged_out', handleLoggedOut);
-    return () => {
-      window.removeEventListener('mm_logged_out', handleLoggedOut);
-    };
+    return () => window.removeEventListener('mm_logged_out', handleLoggedOut);
   }, [navigate]);
 
-  // Set up socket event listeners for real-time order confirmation
   useEffect(() => {
     if (!socket) return;
 
-    // Real-time order confirmation events
     const handleOrderConfirmed = (data) => {
-      console.log('✅ Order confirmed by admin:', data);
-
-      // Show success notification
-      if (data.message) {
-        success(data.message);
-      }
-
-      // Redirect to success page (fallback when redirectUrl isn't provided)
-      if (data.redirectUrl) {
-        navigate(data.redirectUrl);
-      } else if (data.orderId) {
-        navigate(`/order-success/${data.orderId}`);
-      }
+      if (data.message) success(data.message);
+      if (data.redirectUrl) navigate(data.redirectUrl);
+      else if (data.orderId) navigate(`/order-success/${data.orderId}`);
     };
 
-    // Real-time payment confirmation events
-    const handlePaymentVerified = (data) => {
-      console.log('✅ Payment verified by admin:', data);
-
-      // Show success notification
-      if (data.message) {
-        success(data.message);
-      }
-
-      // Redirect to success page (fallback when redirectUrl isn't provided)
-      if (data.redirectUrl) {
-        navigate(data.redirectUrl);
-      } else if (data.orderId) {
-        navigate(`/order-success/${data.orderId}`);
-      }
-    };
-
-    // Register event listeners
     socket.on('orderConfirmed', handleOrderConfirmed);
-    // Server emits `paymentVerified`; keep `paymentConfirmed` as a backward-compatible alias
-    socket.on('paymentVerified', handlePaymentVerified);
-    socket.on('paymentConfirmed', handlePaymentVerified);
+    socket.on('paymentVerified', handleOrderConfirmed);
+    socket.on('paymentConfirmed', handleOrderConfirmed);
 
-    // Cleanup event listeners
     return () => {
       socket.off('orderConfirmed', handleOrderConfirmed);
-      socket.off('paymentVerified', handlePaymentVerified);
-      socket.off('paymentConfirmed', handlePaymentVerified);
+      socket.off('paymentVerified', handleOrderConfirmed);
+      socket.off('paymentConfirmed', handleOrderConfirmed);
     };
-  }, [socket, navigate]);
+  }, [socket, navigate, success]);
 
   const handleLogin = (userData) => {
     login(userData);
-    updateCartCount(); // Update cart count after login
+    updateCartCount();
   };
 
   const handleLogout = () => {
     logout();
-    updateCartCount(); // Force cart count update to 0
+    updateCartCount();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
-      <ModernNavbar user={user} cartCount={cartCount} onLogout={handleLogout} />
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        <Suspense fallback={
-          <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
-          </div>
-        }>
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col">
+      <ModernNavbar user={user} onLogout={handleLogout} />
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-1">
+        <Suspense fallback={<div className="min-h-[50vh]" />}>
           <Routes>
             <Route path="/" element={<HomeRebuild />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/admin" element={<NotFound />} />
             <Route path={`${ADMIN_PATH}/*`} element={<Admin />} />
             <Route path="/festival-special" element={<FestivalSpecial />} />
@@ -149,21 +113,12 @@ function AppContent() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
             <Route path="/oauth/google/callback" element={<GoogleOAuthCallback onLogin={handleLogin} />} />
-            <Route 
-              path="/register" 
-              element={<Register />} 
-            />
-            <Route
-              path="/register/verify-email"
-              element={<RegisterVerifyEmail onVerified={handleLogin} />}
-            />
-            <Route 
-              path="/account" 
-              element={<Account user={user} onUpdate={handleLogin} />} 
-            />
+            <Route path="/register" element={<Register />} />
+            <Route path="/register/verify-email" element={<RegisterVerifyEmail onVerified={handleLogin} />} />
+            <Route path="/account" element={<Account user={user} onUpdate={handleLogin} />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/success" element={<Success />} />
+            <Route path={SUCCESS_PATH} element={<Success />} />
             <Route path="/order-success/:orderId" element={<OrderSuccess />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/order/:id" element={<OrderDetails />} />
@@ -200,3 +155,4 @@ function App() {
 }
 
 export default App;
+

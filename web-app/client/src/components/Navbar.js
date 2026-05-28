@@ -20,6 +20,7 @@ const Navbar = ({ user, onLogout }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [adminAuthState, setAdminAuthState] = useState(isAdminAuthenticated());
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -133,9 +134,16 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="sticky top-4 z-[60] transition-all duration-500 px-4">
+    <>
+    <style>{`
+      @keyframes mobileDrawerIn {
+        from { transform: translateX(100%); opacity: 0.9; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `}</style>
+    <nav className="fixed top-3 left-0 right-0 z-[60] transition-all duration-500 px-4">
       {/* Full Glass Effect Container - Ultra Modern Floating Style */}
-      <div className={`relative mx-auto max-w-7xl ${isDarkMode ? 'bg-gray-900/60' : 'bg-white/75'} backdrop-blur-[25px] rounded-[2rem] border ${isDarkMode ? 'border-white/20' : 'border-white/60'} shadow-[0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)]`}>
+      <div className={`relative mx-auto max-w-7xl ${isDarkMode ? 'bg-gray-900/68' : 'bg-white/82'} backdrop-blur-[34px] rounded-[2rem] border ${isDarkMode ? 'border-white/20' : 'border-white/60'} shadow-[0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)]`}>
         {/* Glass Reflection Effect */}
         <div className={`absolute inset-0 bg-gradient-to-b ${isDarkMode ? 'from-white/10 via-white/5 to-transparent' : 'from-white/80 via-white/40 to-transparent'} pointer-events-none rounded-[2rem]`}></div>
         
@@ -163,9 +171,9 @@ const Navbar = ({ user, onLogout }) => {
         {/* Bottom Soft Glow */}
         <div className={`absolute inset-x-0 bottom-0 h-8 ${isDarkMode ? 'bg-gradient-to-t from-primary-500/10 to-transparent' : 'bg-gradient-to-t from-primary-400/20 to-transparent'} blur-xl`}></div>
         
-        <div className="relative z-10 container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-3 group">
+        <div className="relative z-10 max-w-7xl mx-auto px-2 sm:px-3 md:px-4">
+          <div className="flex items-center h-16 gap-3">
+          <Link to="/" className="flex items-center space-x-2 md:space-x-3 group shrink-0">
             <div className="relative">
               {/* Logo */}
               <div className="w-10 h-10 relative">
@@ -180,15 +188,15 @@ const Navbar = ({ user, onLogout }) => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col">
-              <span className={`text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${isDarkMode ? 'from-white to-gray-300' : 'from-primary-600 to-secondary-600'}`}>
+            <div className="hidden sm:flex flex-col min-w-0">
+              <span className={`text-lg md:text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent truncate ${isDarkMode ? 'from-white to-gray-300' : 'from-primary-600 to-secondary-600'}`}>
                 Pinqoza
               </span>
-              <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Shop Everything</span>
+              <span className={`text-[11px] md:text-xs truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Shop Everything</span>
             </div>
           </Link>
 
-          <form ref={searchRef} onSubmit={handleSearchSubmit} className="hidden md:block relative" style={{ zIndex: 100 }}>
+          <form ref={searchRef} onSubmit={handleSearchSubmit} className="hidden md:block relative w-[220px] lg:flex-1 lg:min-w-[220px] lg:max-w-[520px] xl:max-w-[620px]" style={{ zIndex: 100 }}>
             <div 
               className="relative group cursor-text"
               onClick={(e) => {
@@ -211,7 +219,7 @@ const Navbar = ({ user, onLogout }) => {
                 }}
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Search products..."
-                className={`w-72 pl-11 ${searchQuery.length > 0 ? 'pr-20' : 'pr-4'} py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/30 backdrop-blur-sm border transition-all duration-300 ${isDarkMode ? 'bg-gray-800/60 border-white/20 text-white placeholder-gray-400 focus:bg-gray-800/80' : 'bg-white/70 border-white/60 text-gray-800 placeholder-gray-500 focus:bg-white/90'} shadow-sm group-hover:shadow-md cursor-text`}
+                className={`w-full pl-11 ${searchQuery.length > 0 ? 'pr-20' : 'pr-4'} py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/30 backdrop-blur-sm border transition-all duration-300 ${isDarkMode ? 'bg-gray-800/60 border-white/20 text-white placeholder-gray-400 focus:bg-gray-800/80' : 'bg-white/70 border-white/60 text-gray-800 placeholder-gray-500 focus:bg-white/90'} shadow-sm group-hover:shadow-md cursor-text`}
               />
               {/* Search Icon */}
               <div className={`absolute left-3.5 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-300 ${isDarkMode ? 'bg-white/10 group-hover:bg-white/20' : 'bg-primary-50 group-hover:bg-primary-100'}`}>
@@ -339,7 +347,7 @@ const Navbar = ({ user, onLogout }) => {
             )}
           </form>
 
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-1 ml-1 lg:ml-2">
             <Link 
               to="/" 
               className={`relative px-4 py-2 rounded-xl font-medium transition-all duration-300 group ${isDarkMode ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50'}`}
@@ -358,10 +366,10 @@ const Navbar = ({ user, onLogout }) => {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 shrink-0 ml-auto">
             <button
               onClick={toggleTheme}
-              className={`relative p-2.5 rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group overflow-hidden ${isDarkMode ? 'text-gray-300 hover:text-yellow-400 hover:bg-white/10' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-100/50'}`}
+              className={`hidden md:inline-flex relative p-2.5 rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group overflow-hidden ${isDarkMode ? 'text-gray-300 hover:text-yellow-400 hover:bg-white/10' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-100/50'}`}
               aria-label="Toggle dark mode"
             >
               {/* Button Glow Effect */}
@@ -377,7 +385,7 @@ const Navbar = ({ user, onLogout }) => {
               )}
             </button>
 
-            <Link to="/wishlist" className={`relative p-2.5 rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group overflow-hidden ${isDarkMode ? 'text-gray-300 hover:text-red-400 hover:bg-white/10' : 'text-gray-600 hover:text-red-500 hover:bg-red-50/50'}`}>
+            <Link to="/wishlist" className={`hidden md:inline-flex relative p-2.5 rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group overflow-hidden ${isDarkMode ? 'text-gray-300 hover:text-red-400 hover:bg-white/10' : 'text-gray-600 hover:text-red-500 hover:bg-red-50/50'}`}>
               {/* Heart Pulse Effect */}
               <span className="absolute inset-0 bg-red-500/20 rounded-xl opacity-0 group-hover:opacity-100 animate-pulse"></span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -411,12 +419,17 @@ const Navbar = ({ user, onLogout }) => {
                   </Link>
                 )}
                 {user && !adminAuthState && (
-                  <Link to="/account" className="text-gray-600 hover:text-primary-600 transition-colors dark:text-gray-300 dark:hover:text-primary-400">
+                  <Link to="/account" className="text-gray-600 hover:text-primary-600 transition-colors dark:text-gray-300 dark:hover:text-primary-400 max-w-[170px]">
                     <span className="flex items-center space-x-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span className="hidden md:inline">{user.name}</span>
+                      <span
+                        className="hidden lg:inline-block max-w-[140px] xl:max-w-[180px] truncate align-bottom"
+                        title={user.name || ''}
+                      >
+                        {user.name}
+                      </span>
                     </span>
                   </Link>
                 )}
@@ -430,7 +443,7 @@ const Navbar = ({ user, onLogout }) => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 lg:space-x-2">
                 <Link 
                   to="/login" 
                   className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${isDarkMode ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50/50'}`}
@@ -446,10 +459,84 @@ const Navbar = ({ user, onLogout }) => {
               </div>
             )}
           </div>
+          <button
+            onClick={() => setShowMobileMenu((v) => !v)}
+            className={`md:hidden ml-auto p-2.5 rounded-xl transition-all duration-300 ${isDarkMode ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50/50'}`}
+            aria-label="Open menu"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
+        <form onSubmit={handleSearchSubmit} className="md:hidden pb-3" ref={searchRef}>
+          <div className={`flex items-center rounded-2xl px-3 py-2 border ${isDarkMode ? 'bg-gray-800/70 border-white/10' : 'bg-white/70 border-gray-200'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              value={searchQuery}
+              onChange={handleSearch}
+              onFocus={() => setShowSearch(true)}
+              placeholder="Search products..."
+              className={`ml-2 w-full bg-transparent outline-none text-sm ${isDarkMode ? 'text-white placeholder-gray-400' : 'text-gray-800 placeholder-gray-500'}`}
+            />
+          </div>
+        </form>
         </div>
       </div>
+      <div className={`md:hidden fixed inset-0 z-[120] transition-all duration-300 ${showMobileMenu ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+          <div
+            className={`absolute inset-0 backdrop-blur-sm transition-opacity duration-300 ${showMobileMenu ? 'bg-black/45 opacity-100' : 'bg-black/0 opacity-0'}`}
+            onClick={() => setShowMobileMenu(false)}
+          />
+          <div
+            className={`absolute top-0 right-0 h-full w-[86%] max-w-sm ${isDarkMode ? 'bg-gray-900/98 border-l border-white/10' : 'bg-white/98 border-l border-gray-200'} backdrop-blur-xl shadow-2xl p-4 transform transition-transform duration-300 ease-out ${showMobileMenu ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            <div className="flex items-center justify-end mb-4">
+              <button
+                onClick={() => setShowMobileMenu(false)}
+                className={`group relative inline-flex items-center p-2.5 rounded-xl border transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'text-gray-200 border-white/10 bg-white/5 hover:bg-white/10' : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-100'} shadow-sm`}
+                aria-label="Close menu"
+                title="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span className={`pointer-events-none absolute -bottom-7 right-0 whitespace-nowrap text-[11px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isDarkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-800 text-white'}`}>
+                  Close
+                </span>
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Link to="/" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>🏠</span>Home</Link>
+              <Link to="/products" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>🛍️</span>Products</Link>
+              <Link to="/wishlist" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>❤️</span>Wishlist</Link>
+              <Link to="/cart" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>🛒</span>Cart</Link>
+              {user || adminAuthState ? (
+                <>
+                  <Link to="/account" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>👤</span>Account</Link>
+                  <button onClick={() => { setShowMobileMenu(false); handleLogout(); }} className={`px-4 py-3 rounded-xl text-sm font-semibold text-left flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-red-900/40 text-red-300' : 'bg-red-100 text-red-700'}`}><span>🚪</span>Logout</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setShowMobileMenu(false)} className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}><span>🔐</span>Login</Link>
+                  <Link to="/register" onClick={() => setShowMobileMenu(false)} className="px-4 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-primary-500 to-secondary-500 text-white flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"><span>✨</span>Sign Up</Link>
+                </>
+              )}
+              <button
+                onClick={toggleTheme}
+                className={`px-4 py-3 rounded-xl text-sm font-semibold text-left flex items-center gap-3 transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+              >
+                <span>🌗</span>Toggle Theme
+              </button>
+            </div>
+          </div>
+        </div>
     </nav>
+    <div className="h-28"></div>
+    </>
   );
 };
 
