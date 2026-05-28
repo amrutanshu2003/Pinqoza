@@ -503,7 +503,7 @@ const Navbar = ({ user, onLogout }) => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                <span className={`pointer-events-none absolute -bottom-7 right-0 whitespace-nowrap text-[11px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isDarkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-800 text-white'}`}>
+                <span className={`hidden md:inline-block pointer-events-none absolute -bottom-7 right-0 whitespace-nowrap text-[11px] font-semibold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isDarkMode ? 'bg-gray-700 text-gray-100' : 'bg-gray-800 text-white'}`}>
                   Close
                 </span>
               </button>
@@ -535,7 +535,7 @@ const Navbar = ({ user, onLogout }) => {
           </div>
         </div>
     </nav>
-    <div className="h-28"></div>
+    <div className="h-36 md:h-28"></div>
     </>
   );
 };
