@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import ProductCard from '../components/ProductCard';
@@ -19,7 +19,7 @@ const SeasonalDairy = () => {
       originalPrice: 45,
       discount: 0,
       category: 'milk',
-      image: '❄️',
+      image: 'â„ï¸',
       stock: 100,
       rating: 4.7,
       reviews: 203
@@ -32,7 +32,7 @@ const SeasonalDairy = () => {
       originalPrice: 35,
       discount: 0,
       category: 'milk',
-      image: '🥛',
+      image: 'ðŸ¥›',
       stock: 150,
       rating: 4.5,
       reviews: 178
@@ -45,7 +45,7 @@ const SeasonalDairy = () => {
       originalPrice: 89,
       discount: 0,
       category: 'butter',
-      image: '🧈',
+      image: 'ðŸ§ˆ',
       stock: 80,
       rating: 4.8,
       reviews: 145
@@ -73,13 +73,13 @@ const SeasonalDairy = () => {
             Winter & summer specialties for every season
           </p>
           <div className={`inline-flex items-center px-4 py-2 rounded-full ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-600'} shadow-lg`}>
-            <span className="mr-2">🌤️</span>
+            <span className="mr-2">ðŸŒ¤ï¸</span>
             {seasonalProducts.length} Seasonal Products Available
           </div>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-8 mb-12">
           {seasonalProducts.map((product, index) => (
             <ProductCard
               key={product._id}
@@ -96,7 +96,7 @@ const SeasonalDairy = () => {
             onClick={() => navigate('/')}
             className="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-cyan-600 transform hover:scale-105 transition-all duration-300 shadow-lg"
           >
-            ← Back to Home
+            â† Back to Home
           </button>
         </div>
       </div>
@@ -105,3 +105,4 @@ const SeasonalDairy = () => {
 };
 
 export default SeasonalDairy;
+

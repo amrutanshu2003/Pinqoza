@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import ProductCard from '../components/ProductCard';
@@ -19,7 +19,7 @@ const LimitedEdition = () => {
       originalPrice: 149,
       discount: 0,
       category: 'milk',
-      image: '👑',
+      image: 'ðŸ‘‘',
       stock: 50,
       rating: 5.0,
       reviews: 89
@@ -32,7 +32,7 @@ const LimitedEdition = () => {
       originalPrice: 599,
       discount: 0,
       category: 'sweets',
-      image: '🎀',
+      image: 'ðŸŽ€',
       stock: 25,
       rating: 4.9,
       reviews: 67
@@ -45,7 +45,7 @@ const LimitedEdition = () => {
       originalPrice: 999,
       discount: 0,
       category: 'sweets',
-      image: '💎',
+      image: 'ðŸ’Ž',
       stock: 10,
       rating: 5.0,
       reviews: 45
@@ -73,13 +73,13 @@ const LimitedEdition = () => {
             Exclusive collections with limited availability
           </p>
           <div className={`inline-flex items-center px-4 py-2 rounded-full ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-600'} shadow-lg`}>
-            <span className="mr-2">💎</span>
+            <span className="mr-2">ðŸ’Ž</span>
             {limitedProducts.length} Exclusive Products Available
           </div>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-8 mb-12">
           {limitedProducts.map((product, index) => (
             <ProductCard
               key={product._id}
@@ -96,7 +96,7 @@ const LimitedEdition = () => {
             onClick={() => navigate('/')}
             className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-300 shadow-lg"
           >
-            ← Back to Home
+            â† Back to Home
           </button>
         </div>
       </div>
@@ -105,3 +105,4 @@ const LimitedEdition = () => {
 };
 
 export default LimitedEdition;
+
